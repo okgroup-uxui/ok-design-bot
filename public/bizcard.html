@@ -9,8 +9,8 @@
      - fonts/OKFont-Medium.woff2  (weight 500)
      - fonts/OKFont-Bold.woff2    (weight 700)
    ════════════════════════════════════════════════════════════════ */
-@font-face{font-family:'OKFont';font-weight:300;src:url('./fonts/Ok-Light.woff2') format('woff2');}
-@font-face{font-family:'OKFont';font-weight:500;src:url('./fonts/Ok-Medium.woff2') format('woff2');}
+@font-face{font-family:'OKFont';font-weight:300;src:url('./images/fonts/Ok-Light.woff2') format('woff2');}
+@font-face{font-family:'OKFont';font-weight:500;src:url('./images/fonts/Ok-Medium.woff2') format('woff2');}
 /* ════════════════════════════════════════════════════════════════
    [외부 파일 분리 완료] OKFont @font-face
    ════════════════════════════════════════════════════════════════ */
@@ -235,6 +235,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .ct.on .ct-lb{color:var(--ok)}
 /* aff-grid 버튼 on 상태 체크 표시 */
 .aff.on::before{content:'✓ ';font-size:10px}
+
+/* ═══ WHITE THEME — OK저축은행 Library Semantic tokens (Figma 7367:22696) ═══ */
+:root{
+  --point:#FF571F;--point-strong:#E64813;--o100:#FFF8F6;--o200:#FFF2EE;--o300:#FFEAE4;
+  --ink100:#F7F7F9;--ink200:#F1F3F5;--ink250:#E9EBF0;--ink300:#C8CBD5;--ink400:#B2B7C0;
+  --ink450:#8C94A2;--ink500:#6C7080;--ink600:#4D5764;--ink700:#545964;--ink800:#161C26;
+  --ok:#FF571F;--ok-bg:#FFF2EE;--ok-hover:#E64813;
+  --bg:#F7F7F9;--t1:#161C26;--t2:#545964;--t3:#8C94A2;--br:#E9EBF0;--br-hover:#C8CBD5;--dk:#161C26;
+}
+.aff,.tt,.ct,.fmt,input,select{background:#fff;}
+.dl-row,.loc-info,#dl-sz-label{background:var(--ink100)!important;}
+
+
 </style></head>
 <body><div class="topbar"><div class="tb-in"><img src="./svg/ok_group.svg" alt=""/><div class="tb-dv"></div><span class="tb-tl">명함 생성 시스템</span></div></div><div class="navrow">
   <button class="st on" id="nb-main" onclick="nav('main')">홈</button>
@@ -1395,19 +1408,7 @@ async function downloadSVG(face){
   if(FONT_CSS){
     /* 루트 svg 태그 끝 위치 찾아서 그 뒤에 삽입 (bg-layer defs와 별개) */
     var svgTagEnd=svg.indexOf('>')+1;
-    svg=svg.slice(0,svgTagEnd)+'<defs><style>'+FONT_CSS+'
-/* ═══ WHITE THEME — OK저축은행 Library Semantic tokens (Figma 7367:22696) ═══ */
-:root{
-  --point:#FF571F;--point-strong:#E64813;--o100:#FFF8F6;--o200:#FFF2EE;--o300:#FFEAE4;
-  --ink100:#F7F7F9;--ink200:#F1F3F5;--ink250:#E9EBF0;--ink300:#C8CBD5;--ink400:#B2B7C0;
-  --ink450:#8C94A2;--ink500:#6C7080;--ink600:#4D5764;--ink700:#545964;--ink800:#161C26;
-  --ok:#FF571F;--ok-bg:#FFF2EE;--ok-hover:#E64813;
-  --bg:#F7F7F9;--t1:#161C26;--t2:#545964;--t3:#8C94A2;--br:#E9EBF0;--br-hover:#C8CBD5;--dk:#161C26;
-}
-.aff,.tt,.ct,.fmt,input,select{background:#fff;}
-.dl-row,.loc-info,#dl-sz-label{background:var(--ink100)!important;}
-
-</style></defs>'+svg.slice(svgTagEnd);
+    svg=svg.slice(0,svgTagEnd)+'<defs><style>'+FONT_CSS+'</style></defs>'+svg.slice(svgTagEnd);
   }
 
   svg='<?xml version="1.0" encoding="UTF-8"?>\n'+svg;
