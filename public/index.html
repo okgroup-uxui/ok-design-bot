@@ -75,12 +75,12 @@ textarea::placeholder{color:var(--ink400)}
 .btn.line:hover{background:var(--o200)}
 .btn.done{background:#E9F8E2;color:#137C09;border-color:#53B368}
 .btn:disabled{background:var(--ink250);color:var(--ink400);cursor:default;border-color:transparent}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
-.lcell{border:1px solid var(--ink250);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
-.lcell .th{height:72px;background:var(--ink100);display:grid;place-items:center;padding:10px}
-.lcell img{max-width:100%;max-height:52px;object-fit:contain}
-.lcell .nm{font-size:12px;padding:8px 10px 4px;line-height:1.35;flex:1}
-.lcell .btn{margin:0 8px 8px;padding:5px 0;font-size:12px}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:20px 16px}
+.lcell{display:flex;flex-direction:column;align-items:center;text-align:center}
+.lcell .th{width:100%;height:96px;display:grid;place-items:center}
+.lcell img{max-width:100%;max-height:96px;object-fit:contain}
+.lcell .nm{font-size:12px;color:var(--ink600);margin:8px 0 6px;line-height:1.35}
+.lcell .btn{padding:5px 14px;font-size:12px}
 .frow{border-top:1px solid var(--ink250);padding:12px 0}
 .frow:first-of-type{border-top:0;padding-top:4px}
 .fname{font-size:13px;color:var(--ink500);margin-bottom:2px}
@@ -304,7 +304,8 @@ function renderGenInto(t,cfg,body){
       out.querySelector('.again').onclick=()=>{ta.readOnly=false;go.disabled=false;out.innerHTML='';ta.focus()};
     }catch(e){
       clearInterval(timer);go.disabled=false;ta.readOnly=false;
-      out.innerHTML=`<div class="err">생성하지 못했어요: ${esc(e.message)} — 문구를 다듬어 다시 시도해 주세요.</div>`;
+      const auth=/\((401|403)\)|Forbidden|Unauthorized|환경변수/.test(e.message);
+      out.innerHTML=`<div class="err">${auth?'생성 서버 인증에 실패했어요. 관리자에게 API 설정 확인을 요청해 주세요.':'생성하지 못했어요. 잠시 후 다시 시도해 주세요.'}<br><small style="color:var(--ink450)">${esc(e.message)}</small></div>`;
     }
     down();
   }
