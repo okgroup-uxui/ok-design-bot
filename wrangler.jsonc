@@ -1,0 +1,10 @@
+{
+  "name": "ok-design-bot",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  // public/ 폴더의 화면·이미지·폰트를 그대로 서빙하고,
+  // 파일이 없는 경로(/api/...)만 src/worker.js 가 처리한다.
+  "assets": { "directory": "./public", "binding": "ASSETS" }
+}
