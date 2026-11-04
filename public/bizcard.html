@@ -1,0 +1,1693 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OK금융그룹 명함 생성 시스템</title>
+<style>
+/* ════════════════════════════════════════════════════════════════
+   [외부 파일 분리 완료] OKFont @font-face 3종 (weight 300/500/700)
+   /fonts/ 폴더에 아래 3개 파일을 이 HTML과 같은 상대 경로 기준으로 넣어두면 됨:
+     - fonts/OKFont-Light.woff2   (weight 300)
+     - fonts/OKFont-Medium.woff2  (weight 500)
+     - fonts/OKFont-Bold.woff2    (weight 700)
+   ════════════════════════════════════════════════════════════════ */
+@font-face{font-family:'OKFont';font-weight:300;src:url('./fonts/Ok-Light.woff2') format('woff2');}
+@font-face{font-family:'OKFont';font-weight:500;src:url('./fonts/Ok-Medium.woff2') format('woff2');}
+/* ════════════════════════════════════════════════════════════════
+   [외부 파일 분리 완료] OKFont @font-face
+   ════════════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ok:#FF571F;--ok-bg:#FEF0EB;--ok-hover:#d4481a;
+  --bg:#F0F1F3;--wh:#fff;
+  --t1:#1A1A1A;--t2:#3f3b3a;--t3:#999;
+  --br:#D8D9DC;--br-hover:#b0b2b8;
+  --dk:#3A2F31;--oy:#f5aa00;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+}
+html,body{font-family:'OKFont','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--t1);font-size:14px;font-weight:500;min-height:100vh}
+
+/* ── TOPBAR ─────────────────────────────────── */
+.topbar{background:var(--wh);height:60px;padding:0 28px;display:flex;align-items:center;border-bottom:1px solid var(--br);position:sticky;top:0;z-index:100}
+.tb-in{display:flex;align-items:center;gap:10px}
+.tb-dv{width:1px;height:16px;background:var(--br)}
+.tb-tl{font-size:13px;font-weight:500;color:var(--t3)}
+
+/* ── NAV TABS ────────────────────────────────── */
+.navrow{padding:16px 28px 0;display:flex;gap:6px;background:var(--bg)}
+.st{padding:7px 18px;border-radius:100px;border:1.5px solid var(--br);background:var(--wh);color:var(--t3);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:.15s;white-space:nowrap}
+.st:hover{border-color:var(--br-hover);color:var(--t2)}
+.st.on{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:700}
+
+/* ── PAGES ───────────────────────────────────── */
+.pg{padding:16px 28px 48px;display:none}
+.pg.act{display:block}
+
+/* ── SECTION CARD ────────────────────────────── */
+.sec{background:var(--wh);border-radius:var(--radius-lg);border:1px solid var(--br);padding:24px 24px;margin-bottom:12px}
+.sec:last-child{margin-bottom:0}
+.sec-ttl{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--t3);margin-bottom:18px;font-weight:300;line-height:1.6}
+.sub-t{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 10px;padding-top:16px;border-top:1px solid var(--br);display:flex;align-items:center;gap:4px}
+.sub-t.f{margin-top:0;padding-top:0;border-top:none}
+
+/* ── LAYOUT ──────────────────────────────────── */
+.layout{display:grid;grid-template-columns:1fr 308px;gap:14px;align-items:start}
+
+/* ── HERO ────────────────────────────────────── */
+.hero{background:var(--wh);border-radius:18px;border:1px solid var(--br);padding:64px 40px 0;text-align:center;overflow:hidden;margin-bottom:12px}
+.hero h1{font-size:46px;font-weight:700;line-height:1.18;letter-spacing:-.025em;color:var(--t1);margin-bottom:18px}
+.hero h1 em{color:var(--ok);font-style:normal}
+.hero-sub{font-size:15px;color:var(--t2);line-height:1.55;margin-bottom:34px;font-weight:300}
+
+/* CTA 버튼 */
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--ok);color:#fff;border:none;border-radius:8px;padding:15px 32px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+.cta:hover{background:var(--ok-hover);transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,87,31,.38)}
+.cta:active{transform:scale(.97)}
+
+/* STEP 프로세스 */
+.proc{display:grid;grid-template-columns:repeat(3,1fr);margin-top:36px}
+.ps{padding:26px 24px;border-top:1px solid var(--br)}
+.ps:not(:last-child){border-right:1px solid var(--br)}
+.ps-num{font-size:11px;font-weight:700;color:var(--ok);letter-spacing:.08em;margin-bottom:10px}
+
+.ps h3{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.ps p{font-size:13px;color:var(--t3);line-height:1.45;font-weight:300}
+
+
+/* ── TEMPLATE PAGE ────────────────────────────── */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
+.tc{border:2px solid var(--br);border-radius:14px;padding:20px 16px;cursor:pointer;transition:.18s;background:#fff;display:flex;flex-direction:column;align-items:stretch}
+.tc:hover{border-color:var(--br-hover);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.tc.on{border-color:var(--ok);background:var(--ok-bg);box-shadow:0 4px 20px rgba(255,87,31,.12)}
+.tc-ttl{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px}
+
+/* CARD PREVIEW SVG 래퍼 */
+.card-svg-wrap{width:100%;border-radius:8px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.1);background:#fff;border:1px solid #e4e4e4;line-height:0}
+.card-svg-wrap svg{width:100% !important;height:auto !important;display:block}
+
+/* 템플릿 선택 썸네일 */
+.thumb-wrap{width:100%;border-radius:6px;overflow:hidden;border:1px solid #e0e0e0;line-height:0;margin-bottom:8px;background:#fff}
+.thumb-wrap img{width:100%;height:auto;display:block}
+.thumb-label{font-size:11px;font-weight:500;color:var(--t3);margin-bottom:6px}
+.exec-thumb-wrap{max-width:214px;margin:4px auto}
+.exec-thumb-wrap img{width:100%;height:auto;display:block;border-radius:4px;border:1px solid #e0e0e0}
+.staff-thumb-pair{display:flex;gap:8px;justify-content:center}
+.staff-thumb-item{width:131px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.staff-thumb-item .thumb-label{margin:0 0 4px;width:100%;text-align:center}
+.staff-thumb-item img{width:100%;height:auto;display:block;border-radius:4px}
+.thumb-center-wrap{flex:1;display:flex;flex-direction:column;justify-content:center}
+.thumb-label{font-size:10.5px;color:var(--t3);margin:8px 0 4px;text-align:center;font-weight:500}
+
+/* 스펙 박스 */
+.spec-box{margin-top:8px;background:#f8f8f8;border-radius:8px;padding:10px 12px;border:1px solid #ebebeb}
+.spec-row{display:flex;gap:8px;align-items:baseline;line-height:1.9}
+.spec-k{font-size:10.5px;font-weight:600;color:var(--t3);min-width:36px}
+.spec-v{font-size:11px;color:var(--t2);font-weight:400}
+.tc.on .spec-box{background:var(--ok-bg);border-color:rgba(255,87,31,.2)}
+.tc.on .spec-k{color:rgba(255,87,31,.65)}
+.tc.on .spec-v{color:var(--ok)}
+
+/* ── AFFILIATE ────────────────────────────────── */
+.aff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.aff{padding:12px 8px;border:1.5px solid var(--br);border-radius:9px;background:#fafafa;font-family:inherit;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;transition:.15s;text-align:center}
+.aff:hover{border-color:var(--br-hover);color:var(--t1);background:#fff}
+.aff.on{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:700}
+.c-size{font-size:12px;color:var(--t2);font-weight:500;margin-top:10px}
+.badge{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;margin-left:6px}
+.b-exec{background:#f0ede8;color:var(--t2)}
+.tc.on .b-exec{background:var(--ok);color:#fff}
+.b-staff{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(232,82,30,.2)}
+
+/* ── TYPE TOGGLE (임원/직원) ──────────────────── */
+.type-toggle{display:flex;gap:8px;margin-bottom:2px}
+.tt{flex:1;padding:10px;border-radius:8px;border:1.5px solid var(--br);background:#fafafa;font-family:inherit;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;transition:.15s;text-align:center}
+.tt:hover{border-color:var(--br-hover);color:var(--t2)}
+.tt.on{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:700}
+
+/* ── CARD TYPE SELECTOR ───────────────────────── */
+.ct4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ct5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.ct{border:2px solid var(--br);border-radius:var(--radius-md);padding:12px 8px;cursor:pointer;transition:.15s;text-align:center;background:#fafafa}
+.ct:hover{border-color:var(--br-hover);background:#fff}
+.ct.on{border-color:var(--ok);background:var(--ok-bg)}
+.ct-lb{font-size:12px;font-weight:700;color:var(--ok);margin-bottom:2px;letter-spacing:.02em}
+.ct-ds-only{font-size:12px;font-weight:500;color:var(--t2);line-height:1.7;padding:4px 0 2px}
+.ct-ds-only span{font-size:10.5px;color:var(--t3);font-weight:300;display:block;margin-top:2px}
+.ct.on .ct-ds-only{color:var(--ok)}
+.ct.on .ct-ds-only span{color:rgba(255,87,31,.65)}
+
+/* ── FORM ─────────────────────────────────────── */
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fr2:last-child{margin-bottom:0}
+.fr1{margin-bottom:10px}
+.fr1:last-child{margin-bottom:0}
+label{display:block;font-size:11.5px;font-weight:600;color:var(--t2);margin-bottom:5px}
+label em{color:var(--ok);font-style:normal;margin-left:2px}
+.auto-tag{font-size:10px;color:var(--ok);font-weight:700;margin-left:4px;background:var(--ok-bg);padding:1px 6px;border-radius:100px}
+input,select{width:100%;padding:9px 12px;border:1.5px solid var(--br);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--t1);background:#fafafa;outline:none;transition:.15s;font-weight:500}
+input::placeholder,textarea::placeholder{color:#c0c0c0}
+input:focus,select:focus{border-color:var(--ok);background:var(--wh);box-shadow:0 0 0 3px rgba(255,87,31,.08)}
+#f-eml:focus+span,#f-eml:focus~span{color:var(--ok)}
+#f-eml-wrap:focus-within{border-color:var(--ok)!important;background:var(--wh)!important;box-shadow:0 0 0 3px rgba(255,87,31,.08)}
+input.auto-in{background:#f0f1f3;color:var(--t2)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+.loc-info{background:#f5f6f8;border-radius:7px;padding:10px 12px;margin-top:8px;display:none;border:1px solid var(--br)}
+.loc-kr{font-size:12px;color:var(--t2);line-height:1.5;font-weight:500}
+.loc-en{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.4;font-weight:300}
+
+/* ── PREVIEW PANEL ────────────────────────────── */
+.pv-wrap{position:sticky;top:80px;display:flex;flex-direction:column;gap:10px}
+.pv-face{font-size:10px;font-weight:500;color:var(--t3);text-align:center;letter-spacing:.06em;margin-bottom:6px}
+.pv-face.b{margin-top:14px}
+.pv-div{height:1px;background:var(--br);margin:14px 0}
+.pv-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:8px;font-weight:300}
+.pv-sz{font-size:11px;color:var(--t3);font-weight:300}
+
+/* ── BUTTONS ──────────────────────────────────── */
+.btn-ok{width:100%;padding:14px;border:none;border-radius:10px;background:var(--ok);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+.btn-ok:hover{background:var(--ok-hover);transform:translateY(-1px)}
+.btn-ok:active{transform:scale(.98)}
+.btn-ok.sm{padding:8px 16px;width:auto;margin-top:0;font-size:12.5px;border-radius:7px}
+.btn-line{width:100%;padding:12px;border:1.5px solid var(--br);border-radius:8px;background:var(--wh);font-family:inherit;font-size:13.5px;font-weight:500;color:var(--t2);cursor:pointer;transition:.15s;text-align:center;display:block}
+.btn-line:hover{border-color:#999;color:var(--t1)}
+.btn-prev-sm{padding:12px 22px;border:1.5px solid var(--br);border-radius:8px;background:var(--wh);font-family:inherit;font-size:14px;font-weight:500;color:var(--t2);cursor:pointer;transition:.15s}
+.btn-prev-sm:hover{border-color:#999;color:var(--t1)}
+
+/* ── DOWNLOAD PAGE ────────────────────────────── */
+.fmt-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.fmt{padding:14px 10px;border:2px solid var(--br);border-radius:10px;background:#fafafa;font-family:inherit;cursor:pointer;transition:.15s;text-align:center}
+.fmt:hover{border-color:var(--br-hover);background:#fff}
+.fmt.on{border-color:var(--ok);background:var(--ok-bg)}
+.fmt-icon{font-size:22px;margin-bottom:4px;display:block}
+.fmt-lbl{font-size:13px;font-weight:700;color:var(--t2);display:block}
+.fmt.on .fmt-lbl{color:var(--ok)}
+.fmt-desc{font-size:10.5px;color:var(--t3);margin-top:2px;display:block;font-weight:300}
+.fmt.on .fmt-desc{color:rgba(232,82,30,.6)}
+.dl-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f5f6f8;border-radius:8px;margin-bottom:7px;border:1px solid var(--br)}
+.dl-row:last-child{margin-bottom:0}
+.dl-nm{font-size:13px;font-weight:700;color:var(--t1)}
+.dl-meta{font-size:11px;color:var(--t3);font-weight:300;margin-top:2px}
+
+/* ── INFO / GUIDE BOXES ───────────────────────── */
+.guide-box{background:#f9f8f7;border-radius:10px;padding:14px;border:1px solid var(--br)}
+.gs{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.gs:last-child{margin-bottom:0}
+.gn{width:20px;height:20px;border-radius:50%;background:var(--ok);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.gt{font-size:12px;color:var(--t2);line-height:1.65;font-weight:300}
+.info-box{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:8px;margin-bottom:8px}
+.info-box.green{background:#f0faf4;border:1px solid #b7e0c8}
+.info-box.blue{background:#f0f5ff;border:1px solid #b8c8f0}
+.info-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.info-ttl{font-size:12.5px;font-weight:700}
+.info-txt{font-size:11px;font-weight:300;margin-top:3px;line-height:1.6}
+.green .info-ttl{color:#1a5c33}
+.green .info-txt{color:#2d7a4a}
+.blue .info-ttl{color:#1a3a6b}
+.blue .info-txt{color:#2d4a8a}
+.storage-box{background:#fafaf5;border:1px solid #e8e4d0;border-radius:10px;padding:14px}
+.s-item{font-size:11.5px;color:var(--t2);margin-bottom:4px;display:flex;align-items:center;gap:6px;font-weight:300}
+
+/* ── TOAST ────────────────────────────────────── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--dk);color:#fff;padding:11px 22px;border-radius:100px;font-size:13px;font-weight:700;opacity:0;transition:.3s;pointer-events:none;z-index:9999;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr}
+  .pv-wrap{position:static}
+  .ct4{grid-template-columns:repeat(2,1fr)}
+  .ct5{grid-template-columns:repeat(3,1fr)}
+  .hero h1{font-size:32px}
+  .proc{grid-template-columns:1fr}
+  .ps:not(:last-child){border-right:none;border-bottom:1px solid var(--br)}
+  .aff-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── 추가 개선 ─────────────────────── */
+/* 미리보기 패널 헤더 */
+/* pv-face: 메인 CSS에서 처리 */
+/* 다운로드 페이지 규격 레이블 */
+#dl-sz-label{font-size:11px;color:var(--t3);font-weight:300;background:#f5f6f8;padding:4px 10px;border-radius:100px;border:1px solid var(--br)}
+/* 임시저장 섹션 타이틀 inline */
+.sec-ttl span{font-size:11px;font-weight:300;color:var(--t3)}
+/* 첫번째 ps 강조 */
+.ps:first-child .ps-num{color:var(--ok)}
+/* 카드 타입 선택 on 상태 강화 */
+.ct.on .ct-lb{color:var(--ok)}
+/* aff-grid 버튼 on 상태 체크 표시 */
+.aff.on::before{content:'✓ ';font-size:10px}
+</style></head>
+<body><div class="topbar"><div class="tb-in"><img src="./svg/ok_group.svg" alt=""/><div class="tb-dv"></div><span class="tb-tl">명함 생성 시스템</span></div></div><div class="navrow">
+  <button class="st on" id="nb-main" onclick="nav('main')">홈</button>
+  <button class="st" id="nb-template" onclick="nav('template')">템플릿 선택</button>
+  <button class="st" id="nb-info" onclick="nav('info')">정보 입력</button>
+  <button class="st" id="nb-download" onclick="nav('download')">다운로드</button>
+</div><div id="pg-main" class="pg">
+<div class="hero">
+  <h1>간편하게 만드는<br>OK금융그룹의 명함</h1>
+  <p class="hero-sub">로그인 없이 빠르게 생성하는 명함 시스템입니다.<br>소속과 상세 정보를 입력하면 자동으로 명함이 생성됩니다.<br>SVG 인쇄용 또는 JPG 화면용으로 바로 다운로드하세요.</p>
+  <button class="cta" onclick="nav('template')">명함 생성하기 →</button>
+  <div class="proc">
+    <div class="ps">
+      <div class="ps-num">STEP 01</div>
+      <h3>소속 및 템플릿 선택</h3>
+      <p>임원용 또는 직원용을 선택하고, 직원용에서는 세부적으로 소속 계열사를 선택합니다.</p>
+    </div>
+    <div class="ps">
+      <div class="ps-num">STEP 02</div>
+      <h3>정보 입력</h3>
+      <p>이름, 직급/직책, 연락처, 근무지 등을 입력하면 명함이 실시간으로 미리보기됩니다.</p>
+    </div>
+    <div class="ps">
+      <div class="ps-num">STEP 03</div>
+      <h3>다운로드</h3>
+      <p>인쇄용 SVG와 화면용 JPG를 바로 저장합니다. SVG 파일은 인쇄소에 직접 전달합니다.</p>
+    </div>
+  </div>
+</div>
+</div>
+<div id="pg-template" class="pg">
+  <div class="sec">
+    <div class="sec-ttl">명함 종류 선택</div><div class="sec-sub">임원용과 직원용은 명함 디자인과 규격이 다릅니다. 아래에서 확인 후 선택해주세요.</div>
+    <div class="type-grid">
+      <div class="tc" id="tc-exec" onclick="selExec()">
+        <div class="tc-ttl" style="display:flex;align-items:center;gap:8px;justify-content:space-between">임원용 <span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;background:#f0ede8;color:var(--t3)">90×50mm</span></div>
+        <div class="spec-box">
+          <div class="spec-row"><span class="spec-k">규격</span><span class="spec-v">90 × 50 mm</span></div>
+          <div class="spec-row"><span class="spec-k">지질</span><span class="spec-v">아코팩 300g/㎡</span></div>
+          <div class="spec-row"><span class="spec-k">제작</span><span class="spec-v">양면 8도 인쇄, 양면 읏 오렌지박</span></div>
+        </div>
+        <div class="thumb-center-wrap">
+          <div class="thumb-label">앞면</div>
+          <div class="exec-thumb-wrap"><img src="./svg/img_front_01.svg" alt=""/></div>
+          <div class="thumb-label">뒷면</div>
+          <div class="exec-thumb-wrap"><img src="./svg/img_back_01.svg" alt=""/></div>
+        </div>
+      </div>
+      <div class="tc" id="tc-staff" onclick="selStaff()">
+        <div class="tc-ttl" style="display:flex;align-items:center;gap:8px;justify-content:space-between">직원용 <span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;background:var(--ok-bg);color:var(--ok)">85×55mm</span></div>
+        <div class="spec-box">
+          <div class="spec-row"><span class="spec-k">규격</span><span class="spec-v">85 × 55 mm</span></div>
+          <div class="spec-row"><span class="spec-k">지질</span><span class="spec-v">반누보 227g/㎡</span></div>
+          <div class="spec-row"><span class="spec-k">제작</span><span class="spec-v">양면 8도 인쇄</span></div>
+        </div>
+        <div class="thumb-center-wrap">
+          <div class="staff-thumb-pair"><div class="staff-thumb-item"><div class="thumb-label">앞면</div><img src="./svg/img_front_02.svg" alt=""/></div>
+          <div class="staff-thumb-item"><div class="thumb-label">뒷면</div><img src="./svg/img_back_02.svg" alt=""/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="sec" id="aff-sec" style="display:none"><div class="sec-ttl">계열사 선택</div><div class="sec-sub">소속 계열사를 선택하세요. 선택한 계열사의 로고와 주소가 명함에 반영됩니다.</div><div class="aff-grid"><button class="aff" onclick="selAff(this,'OK홀딩스')">OK홀딩스</button><button class="aff" onclick="selAff(this,'OK저축은행')">OK저축은행</button><button class="aff" onclick="selAff(this,'OK캐피탈')">OK캐피탈</button><button class="aff" onclick="selAff(this,'OK인베스트먼트파트너스')">OK인베스트먼트파트너스</button><button class="aff" onclick="selAff(this,'OK벤처스')">OK벤처스</button><button class="aff" onclick="selAff(this,'OK AX')">OK AX</button><button class="aff" onclick="selAff(this,'OK네트웍스')">OK네트웍스</button><button class="aff" onclick="selAff(this,'OK넥스트')">OK넥스트</button><button class="aff" onclick="selAff(this,'아프로신용정보')">아프로신용정보</button><button class="aff" onclick="selAff(this,'아프로FnI')">아프로F&I</button><button class="aff" onclick="selAff(this,'엑스인하우징')">엑스인하우징</button><button class="aff" onclick="selAff(this,'OK 옷맨 프로배구단')">OK 읏맨 프로배구단</button><button class="aff" onclick="selAff(this,'OK 옷맨 럭비단')">OK 읏맨 럭비단</button><button class="aff" onclick="selAff(this,'OK 배·정 장학재단')">OK 배·정 장학재단</button></div></div>
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+  <button class="btn-prev-sm" onclick="nav('main')">← 이전</button>
+  <button class="btn-ok" style="width:auto;padding:12px 26px;margin-top:0" onclick="goNextTemplate()">다음 →</button>
+</div></div><div id="pg-info" class="pg">
+<div class="sec">
+  <div style="font-size:11.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">명함 종류</div>
+  <div class="type-toggle">
+    <button class="tt on" id="tt-exec" onclick="setInfoType('exec')">임원용</button>
+    <button class="tt" id="tt-staff" onclick="setInfoType('staff')">직원용</button>
+  </div>
+</div>
+
+<!-- 임원용 유형 선택 -->
+<div class="sec" id="ct-exec-sec">
+  <div class="sec-ttl">앞면 유형 선택</div>
+  <div class="sec-sub">명함에 반영될 연락처 구성을 선택하세요. 미리보기 창에서 실시간 확인 가능합니다.</div>
+  <div class="ct4">
+    <div class="ct on" id="ec1" onclick="setExT(1)">
+      <div class="ct-lb">유형 1</div>
+      <div class="ct-ds-only">T · M · E<br><span>기본형</span></div>
+    </div>
+    <div class="ct" id="ec2" onclick="setExT(2)">
+      <div class="ct-lb">유형 2</div>
+      <div class="ct-ds-only">T · F · M · E<br><span>팩스 추가</span></div>
+    </div>
+    <div class="ct" id="ec3" onclick="setExT(3)">
+      <div class="ct-lb">유형 3</div>
+      <div class="ct-ds-only">T · M · E · E₂<br><span>이메일 2개</span></div>
+    </div>
+    <div class="ct" id="ec4" onclick="setExT(4)">
+      <div class="ct-lb">유형 4</div>
+      <div class="ct-ds-only">T · M · E<br><span>이름 한자 표기</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 직원용 유형 선택 -->
+<div class="sec" id="ct-staff-sec" style="display:none">
+  <div class="sec-ttl">앞면 유형 선택</div>
+  <div class="sec-sub">명함에 반영될 연락처 구성을 선택하세요. 미리보기 창에서 실시간 확인 가능합니다.</div>
+  <div class="ct5">
+    <div class="ct on" id="sc1" onclick="setStT(1)">
+      <div class="ct-lb">유형 1</div>
+      <div class="ct-ds-only">T · M · E<br><span>기본형</span></div>
+    </div>
+    <div class="ct" id="sc2" onclick="setStT(2)">
+      <div class="ct-lb">유형 2</div>
+      <div class="ct-ds-only">M · E<br><span>전화 없음</span></div>
+    </div>
+    <div class="ct" id="sc3" onclick="setStT(3)">
+      <div class="ct-lb">유형 3</div>
+      <div class="ct-ds-only">M · F · E<br><span>팩스 포함</span></div>
+    </div>
+    <div class="ct" id="sc4" onclick="setStT(4)">
+      <div class="ct-lb">유형 4</div>
+      <div class="ct-ds-only">T · F · M · E<br><span>전화+팩스</span></div>
+    </div>
+    <div class="ct" id="sc5" onclick="setStT(5)">
+      <div class="ct-lb">유형 5</div>
+      <div class="ct-ds-only">T · M · E · E₂<br><span>이메일 2개</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+<div>
+  <div class="sec" style="margin-bottom:12px">
+    <div class="sub-t f">👤 이름</div>
+    <div class="fr2">
+      <div><label>이름 (한글)</label><input id="f-nkr" placeholder="김 읏 맨" oninput="upv()"></div>
+      <div><label>이름 (영문)</label><input id="f-nen" placeholder="OKMAN KIM" oninput="upv()"></div>
+    </div>
+    <div id="hj-row" style="display:none" class="fr1">
+      <label>이름 (한자)</label><input id="f-nhj" placeholder="金邑萬" oninput="upv()">
+    </div>
+    <div id="exec-fields">
+      <div class="sub-t">🏢 계열사</div>
+      <div class="fr2">
+        <div><label>계열사명 (한글)</label><select id="f-co-e" onchange="onExecCoCh()"><option value="">선택하세요</option></select></div>
+        <div><label>계열사명 (영문)<span class="auto-tag">자동</span></label><input id="f-co-e-en" class="auto-in" placeholder="계열사 선택 시 자동 입력" readonly></div>
+      </div>
+      <div class="sub-t">🏷 직함 / 부서</div>
+      <div class="fr2">
+        <div><label>직함 (한글)</label><input id="f-tkr" placeholder="이사" oninput="upv()"></div>
+        <div><label>직함 (영문)</label><input id="f-ten" placeholder="Advisor" oninput="upv()"></div>
+      </div>
+      <div class="fr2">
+        <div><label>부서 (한글)</label><input id="f-dkr" placeholder="경영관리본부" oninput="upv()"></div>
+        <div><label>부서 (영문)</label><input id="f-den" placeholder="Business Management Division" oninput="upv()"></div>
+      </div>
+    </div>
+    <div id="staff-fields" style="display:none">
+      <div class="sub-t">🏢 계열사</div>
+      <div class="fr1"><label>계열사 선택</label><select id="f-co-s" onchange="onStaffCoCh()"><option value="">선택하세요</option></select></div>
+      <div class="fr1"><label>홈페이지<span class="auto-tag">자동</span></label><input id="f-site-s" class="auto-in" placeholder="계열사 선택 시 자동 입력" readonly></div>
+      <div class="sub-t">📂 부서명</div>
+      <div class="fr2">
+        <div><label>부서명 (한글)</label><input id="f-ds-kr" placeholder="그래픽디자인팀" oninput="upv()"></div>
+        <div><label>부서명 (영문)</label><input id="f-ds-en" placeholder="Graphic Design Team" oninput="upv()"></div>
+      </div>
+      <div class="sub-t">🏷 직책 / 직급</div>
+      <div class="fr2">
+        <div><label>직급 (한글)</label><select id="f-ts-kr" onchange="onTitleCh()"><option value="">선택하세요</option></select></div>
+        <div><label>직급 (영문)<span class="auto-tag">자동</span></label><input id="f-ts-en" class="auto-in" placeholder="계열사 선택 시 자동 입력" readonly></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec" style="margin-bottom:12px">
+    <div class="sub-t f">📞 연락처</div>
+    <div id="tel-row" class="fr1"><label>전화번호</label><input id="f-tel" placeholder="00-0000-0000" oninput="upv()"></div>
+    <div id="fax-row" class="fr1" style="display:none;margin-top:10px"><label>FAX</label><input id="f-fax" placeholder="00-0000-0000" oninput="upv()"></div>
+    <div class="fr1" style="margin-top:10px">
+      <label>휴대폰</label><input id="f-mob" placeholder="010-0000-0000" oninput="upv()">
+    </div>
+    <div class="fr1" style="margin-top:10px">
+      <label>이메일 1</label>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input id="f-eml-id" placeholder="아이디" oninput="onEmlCh()" maxlength="30"
+          style="flex:1;min-width:0;padding:9px 12px;border:1.5px solid var(--br);border-radius:var(--radius-sm);background:#fafafa;outline:none;font-family:inherit;font-size:13px;color:var(--t1);font-weight:500;transition:.15s">
+        <span style="font-size:13px;color:var(--t3);flex-shrink:0">@</span>
+        <select id="f-eml-domain" onchange="onEmlCh()"
+          style="flex:1;min-width:0;padding:9px 10px;border:1.5px solid var(--br);border-radius:var(--radius-sm);background:#fafafa;outline:none;font-family:inherit;font-size:13px;color:var(--t1);appearance:none;cursor:pointer;transition:.15s">
+          <option value="okfngroup.com">okfngroup.com</option>
+          <option value="naver.com">naver.com</option>
+          <option value="gmail.com">gmail.com</option>
+          <option value="daum.net">daum.net</option>
+          <option value="kakao.com">kakao.com</option>
+          <option value="hanmail.net">hanmail.net</option>
+          <option value="nate.com">nate.com</option>
+          <option value="icloud.com">icloud.com</option>
+          <option value="custom">직접입력</option>
+        </select>
+      </div>
+      <input id="f-eml-custom" placeholder="도메인 직접입력 (예: company.com)" oninput="onEmlCh()"
+        style="display:none;margin-top:6px;width:100%;padding:9px 12px;border:1.5px solid var(--br);border-radius:var(--radius-sm);background:#fafafa;outline:none;font-family:inherit;font-size:13px;color:var(--t1);font-weight:500;transition:.15s">
+      <input type="hidden" id="f-eml" value="">
+    </div>
+    <div id="e2-row" style="display:none;margin-top:10px">
+      <label>이메일 2</label>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input id="f-em2-id" placeholder="아이디" oninput="onEm2Ch()" maxlength="30"
+          style="flex:1;min-width:0;padding:9px 12px;border:1.5px solid var(--br);border-radius:var(--radius-sm);background:#fafafa;outline:none;font-family:inherit;font-size:13px;color:var(--t1);font-weight:500;transition:.15s">
+        <span style="font-size:13px;color:var(--t3);flex-shrink:0">@</span>
+        <select id="f-em2-domain" onchange="onEm2Ch()"
+          style="flex:1;min-width:0;padding:9px 10px;border:1.5px solid var(--br);border-radius:var(--radius-sm);background:#fafafa;outline:none;font-family:inherit;font-size:13px;color:var(--t1);appearance:none;cursor:pointer;transition:.15s">
+          <option value="gmail.com">gmail.com</option>
+          <option value="naver.com">naver.com</option>
+          <option value="daum.net">daum.net</option>
+          <option value="kakao.com">kakao.com</option>
+          <option value="hanmail.net">hanmail.net</option>
+          <option value="nate.com">nate.com</option>
+          <option value="icloud.com">icloud.com</option>
+          <option value="custom">직접입력</option>
+        </select>
+      </div>
+      <input id="f-em2-custom" placeholder="도메인 직접입력 (예: company.com)" oninput="onEm2Ch()"
+        style="display:none;margin-top:6px;width:100%;padding:9px 12px;border:1.5px solid var(--br);border-radius:var(--radius-sm);background:#fafafa;outline:none;font-family:inherit;font-size:13px;color:var(--t1);font-weight:500;transition:.15s">
+      <!-- 실제 f-em2 hidden (이메일 조합 결과 저장) -->
+      <input type="hidden" id="f-em2" value="">
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sub-t f">📍 근무지</div>
+    <div class="fr1"><label>근무지 선택</label><select id="f-loc" onchange="onLocCh()"><option value="">선택하세요</option></select></div>
+    <div id="loc-info" class="loc-info"><div id="loc-kr" class="loc-kr"></div><div id="loc-en" class="loc-en"></div></div>
+  </div>
+</div>
+<div class="pv-wrap">
+  <div class="sec">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px">미리보기</span>
+      <span class="pv-sz" id="p-sz" style="background:#f5f6f8;padding:3px 9px;border-radius:100px;border:1px solid var(--br)">90×50mm</span>
+    </div>
+    <div id="pv-stage"></div>
+    <div class="pv-hint">✦ 입력 시 실시간으로 반영됩니다</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-prev-sm" style="flex:1" onclick="nav('template')">← 템플릿</button>
+    <button class="btn-ok" style="flex:2;margin-top:0" onclick="goToDownload()">다운로드 확인 →</button>
+  </div>
+</div>
+</div>
+</div><div id="pg-download" class="pg">
+<div class="layout">
+<div class="sec">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div class="sec-ttl" style="margin:0">명함 최종 확인</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="dl-sz-label" style="font-size:11px;color:var(--t3);font-weight:300;background:#f5f6f8;padding:4px 10px;border-radius:100px;border:1px solid var(--br)">90×50mm</span>
+    </div>
+  </div>
+  <div id="dl-preview"></div>
+</div>
+<div>
+  <div class="sec" style="margin-bottom:10px">
+    <div class="sec-ttl">파일 다운로드</div>
+    <div class="sec-sub">용도에 맞는 형식을 선택하세요.</div>
+    <div class="fmt-tabs">
+      <button class="fmt on" id="dl-fmt-jpg" onclick="setDlFmt('jpg')">
+        <span class="fmt-icon">🖼️</span><span class="fmt-lbl">화면용 JPG</span><span class="fmt-desc">소셜·이메일 첨부용</span>
+      </button>
+      <button class="fmt" id="dl-fmt-svg" onclick="setDlFmt('svg')">
+        <span class="fmt-icon">⬡</span><span class="fmt-lbl">인쇄용 SVG</span><span class="fmt-desc">벡터 · 인쇄소 납품용</span>
+      </button>
+    </div>
+    <div id="dl-jpg-panel">
+      <div class="dl-row"><div><div class="dl-nm">앞면 JPG</div><div class="dl-meta">okfg_card_front.jpg</div></div><button class="btn-ok sm" onclick="downloadJPG('front')">다운로드</button></div>
+      <div class="dl-row"><div><div class="dl-nm">뒷면 JPG</div><div class="dl-meta">okfg_card_back.jpg</div></div><button class="btn-ok sm" onclick="downloadJPG('back')">다운로드</button></div>
+    </div>
+    <div id="dl-svg-panel" style="display:none">
+      <div class="info-box green"><span class="info-icon">✅</span><div><div class="info-ttl">OKFont 임베딩 벡터 SVG</div><div class="info-txt">OKFont가 파일에 직접 포함됩니다. 아웃라인 없이 인쇄소 납품 가능합니다.</div></div></div>
+      <div style="margin-top:10px">
+        <div class="dl-row"><div><div class="dl-nm">앞면 + 뒷면 SVG</div><div class="dl-meta">okfg_card_front.svg &amp; back.svg (순차 저장)</div></div><button class="btn-ok sm" onclick="downloadBothSVG()">다운로드</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec" style="margin-bottom:10px">
+    <div class="sec-ttl" style="margin-bottom:12px">인쇄 전달 안내</div>
+    <div class="guide-box">
+      <div class="gs"><div class="gn">1</div><div class="gt">SVG 파일을 다운로드합니다.</div></div>
+      <div class="gs"><div class="gn">2</div><div class="gt">파일을 제작업체 이메일로 전달합니다.<br><strong style="color:var(--ok)">designmarket79@gmail.com</strong></div></div>
+      <div class="gs"><div class="gn">3</div><div class="gt">인쇄소에서 블리드·재단선 추가, CMYK 변환 후 인쇄합니다.</div></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl" style="margin-bottom:10px">임시저장 <span style="font-size:11px;font-weight:300;color:var(--t3);background:#f5f6f8;padding:2px 8px;border-radius:100px;border:1px solid var(--br)">브라우저 내 보관</span></div>
+    <div class="storage-box">
+      <div class="s-item"><span style="color:var(--ok)">✓</span> 뒤로 가도 입력 정보 유지</div>
+      <div class="s-item"><span style="color:var(--ok)">✓</span> 브라우저 종료 전까지 자동 보존</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="autoSave();showToast('저장 완료 ✓')" style="flex:1;padding:8px;border:1.5px solid var(--ok);border-radius:7px;background:var(--ok-bg);color:var(--ok);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">💾 저장</button>
+        <button onclick="clearStorage()" style="flex:1;padding:8px;border:1.5px solid var(--br);border-radius:7px;background:white;color:var(--t3);font-family:inherit;font-size:12px;cursor:pointer">🗑 초기화</button>
+      </div>
+      <div id="storage-status" style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center;font-weight:300"></div>
+    </div>
+  </div>
+  <button class="btn-line" onclick="nav('info')" style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px">← 정보 입력으로 돌아가기</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ════════════════════════════════════════════════════════════════
+   [외부 파일 분리] 로고/아이콘/배경 SVG 리소스
+   이 HTML 파일과 같은 위치에 ./logo/*.svg 파일들을 넣어두면 됨.
+
+   [리팩터링] 구조를 3단으로 정리:
+     ① 공통 리소스 — 계열사 구분 없이 고정
+     ② 임원(exec) 앞면/뒷면 — bg와 로고 분리, 계열사 구분 없음
+     ③ 직원(staff) 앞면 — 계열사별 bg+로고를 STAFF_AFF_ASSETS 한 곳에서 매칭
+       (직원 뒷면은 계열사 구분 없이 공통이므로 ①에 포함)
+   이전에는 계열사별 bg 14개(STAFF_BG_*_URI)와 로고 14개(STAFF_*_URI)가
+   변수로 흩어져 있고, 그걸 다시 매핑하는 map이 getStaffFrontBgURI /
+   getStaffLogoInfo 두 함수 안에 각각 따로 있었음 → 계열사 추가/수정 시
+   4곳(변수 2개+map 2곳)을 손봐야 했음. 이제는 계열사당 1개 항목(bg+로고)만
+   수정하면 됨. staff-front-full.svg는 실제로 쓰이지 않아 제거함.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ① 공통 리소스 */
+var LOGO_FRONT_URI='./logo/logo-front.svg';var LOGO_BACK_URI='./logo/logo-back.svg';
+var ICON_EUT_URI='./logo/icon-eut.svg';var ICON_OK_URI='./logo/icon-ok.svg';
+var LOGO_STAFF_FRONT_URI='./logo/logo-staff-front.svg';var LOGO_STAFF_BACK_URI='./logo/logo-staff-back.svg';
+/* 직원(staff) 뒷면 — OK금융그룹 통합 디자인, 계열사 구분 없음 */
+var STAFF_FRONT_BG_URI='./logo/staff-front-bg.svg';
+var STAFF_BACK_BG_URI='./logo/staff-back-bg.svg';var STAFF_BACK_LOGO_URI='./logo/staff-back-logo.svg';
+
+/* ② 임원(exec) 앞면 / 뒷면 — bg와 로고를 분리 배치, 계열사 구분 없음 */
+var EXEC_FRONT_BG_URI='./logo/exec-front-bg.svg';var EXEC_FRONT_LOGO_URI='./logo/exec-front-logo.svg';
+var EXEC_BACK_BG_URI='./logo/exec-back-bg.svg';var EXEC_BACK_LOGO_URI='./logo/exec-back-logo.svg';
+
+/* ③ 직원(staff) 앞면 — 계열사별 매칭 (14개 계열사 = f-co-s 셀렉트박스 옵션과 동일)
+   bg: 앞면 전체 배경 SVG, logo: 배경 위에 얹는 계열사 로고 (w/h/x는 mm, y는 기본 5)
+   OK저축은행 로고는 기존에 쓰던 LOGO_STAFF_FRONT_URI를 그대로 재사용 */
+var STAFF_AFF_ASSETS={
+  'OK저축은행':            {bg:STAFF_FRONT_BG_URI,  logo:{u:LOGO_STAFF_FRONT_URI,          w:24,   h:9.4}},
+  'OK홀딩스':              {bg:STAFF_FRONT_BG_URI, logo:{u:'./logo/staff-okholdings.svg', w:23.8, h:9.4}},
+  'OK캐피탈':              {bg:STAFF_FRONT_BG_URI,  logo:{u:'./logo/staff-okcapital.svg',  w:17.1, h:9.4}},
+  'OK인베스트먼트파트너스': {bg:STAFF_FRONT_BG_URI,   logo:{u:'./logo/staff-okinvest.svg',   w:24.1, h:9.4}},
+  'OK벤처스':              {bg:STAFF_FRONT_BG_URI, logo:{u:'./logo/staff-okventures.svg', w:30,   h:9.4}},
+  'OK AX':                 {bg:STAFF_FRONT_BG_URI,       logo:{u:'./logo/staff-okax.svg',       w:23.8, h:9.4}},
+  'OK네트웍스':            {bg:STAFF_FRONT_BG_URI, logo:{u:'./logo/staff-oknetworks.svg', w:23.9, h:9.4}},
+  'OK넥스트':              {bg:STAFF_FRONT_BG_URI,     logo:{u:'./logo/staff-oknext.svg',     w:23.8, h:9.4}},
+  '아프로신용정보':         {bg:STAFF_FRONT_BG_URI,    logo:{u:'./logo/staff-aprosci.svg',    w:27,   h:6.2, x:3}},
+  '아프로FnI':             {bg:STAFF_FRONT_BG_URI,    logo:{u:'./logo/staff-afroefi.svg',    w:18.1, h:6.2}},
+  '엑스인하우징':          {bg:STAFF_FRONT_BG_URI,   logo:{u:'./logo/staff-xhousing.svg',   w:27,   h:3.6}},
+  'OK 옷맨 프로배구단':    {bg:STAFF_FRONT_BG_URI,   logo:{u:'./logo/staff-okvolley.svg',   w:30,   h:9.4}},
+  'OK 옷맨 럭비단':        {bg:STAFF_FRONT_BG_URI,    logo:{u:'./logo/staff-okrugby.svg',    w:29.9, h:9.4}},
+  'OK 배·정 장학재단':     {bg:STAFF_FRONT_BG_URI,  logo:{u:'./logo/staff-okscholar.svg',  w:30,   h:9.4}}
+};
+var STAFF_AFF_DEFAULT='OK저축은행';
+/* ════════════════════════════════════════════════════════════════ */
+</script><script>function setDlFmt(f){
+  var jb=document.getElementById('dl-fmt-jpg'),sb=document.getElementById('dl-fmt-svg');
+  var jp=document.getElementById('dl-jpg-panel'),sp=document.getElementById('dl-svg-panel');
+  if(jb)jb.className=f==='jpg'?'fmt on':'fmt';if(sb)sb.className=f==='svg'?'fmt on':'fmt';
+  if(jp)jp.style.display=f==='jpg'?'block':'none';if(sp)sp.style.display=f==='svg'?'block':'none';
+}</script><script>
+/* ── STATE ──────────────────────── */
+var S={page:'main',type:null,aff:null,eType:1,sType:1,d:{}};
+var execCoMap=[['OK홀딩스','OK Holdings'],['OK저축은행','OK Savings Bank'],['OK캐피탈','OK Capital'],['OK인베스트먼트파트너스','OK Investment Partners'],['OK벤처스','OK Ventures'],['OK AX','OK AX'],['OK네트웍스','OK Networks'],['OK넥스트','OK Next'],['아프로신용정보','Apro Credit Information'],['아프로FnI','Apro F&I']];
+var siteMap={
+  'OK저축은행':'www.oksavingsbank.com',
+  'OK홀딩스':'www.okfngroup.com',
+  'OK캐피탈':'www.okaycapital.co.kr',
+  'OK인베스트먼트파트너스':'www.okfngroup.com',
+  'OK벤처스':'www.okfngroup.com',
+  'OK AX':'www.ok-ax.co.kr',
+  'OK네트웍스':'www.okfngroup.com',
+  'OK넥스트':'www.okfngroup.com',
+  '아프로신용정보':'www.yesci.co.kr',
+  '아프로FnI':'www.aprofni.com',
+  '엑스인하우징':'www.okfngroup.com',
+  'OK 옷맨 프로배구단':'www.okfinancialsports.com/volleyball',
+  'OK 옷맨 럭비단':'www.okfinancialsports.com/rugby',
+  'OK 배·정 장학재단':'www.okscholarship.or.kr'
+};
+var defSite='www.okfngroup.com';
+var tMap=[['부장','Department Manager'],['팀장','Team Manager'],['차장','Deputy General Manager'],['대리','Assistant Manager'],['프로','Pro'],['책임','Assistant Manager'],['선임','Senior Manager'],['전임','Associate Manager'],['주임','Assistant Manager'],['사원','Staff, Assistant'],['지점장','Branch Manager'],['센터장','Center Manager']];
+var locs=[[1,'본점(상공회의소)','서울특별시 중구 세종대로39, 10층 (남대문로4가, 상공회의소)','10F, 39, Sejong-daero, Jung-gu, Seoul, Korea'],[2,'회현센터','서울특별시 중구 퇴계로12길 50, 4층 (회현동1가, 홍덕빌딩)','4F, 50, Toegye-ro 12-gil, Jung-gu, Seoul, Korea'],[3,'대전센터','대전광역시 중구 대종로 540, 7층 (선화동, 유안타증권빌딩)','7F, 540, Daejong-ro, Jung-gu, Daejeon, Korea'],[4,'부산센터','부산광역시 부산진구 신암로 9, 7층 (범천동, 범천빌딩)','7F, 9, Sinam-ro, Busanjin-gu, Busan, Korea'],[5,'인농빌딩','서울 중구 수표로 23, 4층 (저동2가, 인농빌딩)','4F, 23, Supyo-ro, Jung-gu, Seoul, Korea'],[6,'우리빌딩','서울 중구 칠패로 42, 10층 (봉래동1가, 우리빌딩)','10F, 42, Chilpae-ro, Jung-gu, Seoul, Korea'],[7,'서울역','서울특별시 용산구 한강대로 403, 2층 (동자동, 세단빌딩)','2F, 403, Hangang-daero, Yongsan-gu, Seoul, Korea'],[8,'선릉','서울특별시 강남구 테헤란로 403, 2층 (삼성동, 리치타워)','2F, 403, Teheran-ro, Gangnam-gu, Seoul, Korea'],[9,'이수','서울특별시 동작구 동작대로137, 2,3층 (사당동, JH타워)','2~3F, 137, Dongjak-daero, Dongjak-gu, Seoul'],[10,'대전중앙','대전광역시 중구 대종로 540, 6층','6F, 540, Daejong-ro, Jung-gu, Daejeon, Korea'],[11,'일산','경기도 고양시 일산서구 강선로 49, 2층 (주엽동)','2F, 49, Gangseon-ro, Ilsanseo-gu, Goyang-si, Gyeonggi-do'],[12,'잠실','서울특별시 송파구 백제고분로 364, 1층 (석촌동, 대신빌딩)','1F, 364, Baekjegobun-ro, Songpa-gu, Seoul'],[13,'노원','서울특별시 노원구 노해로 459, 2층 (상계동, 메가빌딩)','2F, 459, Nohae-ro, Nowon-gu, Seoul, Korea'],[14,'분당','경기도 성남시 분당구 황새울로 348, 2층 (서현동, 세현빌딩)','2F, 348, Hwangsaeul-ro, Bundang-gu, Seongnam-si'],[15,'강남','서울특별시 강남구 강남대로 310, 1층 (역삼동, 유니온센터)','1F, 310, Gangnam-daero, Gangnam-gu, Seoul'],[16,'광주','광주광역시 서구 상무평화로79, 2층 (치평동, 팔복빌딩)','2F, 79, Sangmupyeonghwa-ro, Seo-gu, Gwangju'],[17,'수원','경기도 수원시 팔달구 권광로 199, 2층 (인계동, 세영빌딩)','2F, 199, Gwongwang-ro, Paldal-gu, Suwon-si'],[18,'수원(PL)','경기도 수원시 팔달구 권광로 199, 6층 (인계동, 세영빌딩)','6F, 199, Gwongwang-ro, Paldal-gu, Suwon-si'],[19,'인천구월','인천광역시 남동구 인하로507번길 4, 6층 (구월동, 한성빌딩)','6F, 4, Inha-ro 507beon-gil, Namdong-gu, Incheon'],[20,'제주','제주특별자치도 제주시 연북로10, 501호 (노형동, 신영빌딩)','5F, 10, Yeonbuk-ro, Jeju-si, Jeju-do'],[21,'노원(OCI)','서울특별시 노원구 동일로 1419, 디와이홀딩스 빌딩 601호','6F, 1419, Dongil-ro, Nowon-gu, Seoul, Korea'],[22,'대구','대구광역시 중구 국채보상로 535, 3층 (수동, 태남빌딩)','3F, 535, Gukchaebosang-ro, Jung-gu, Daegu'],[23,'광주(OCI)','광주광역시 광산구 장신로 44, 5층 (장덕동, 늘푸른빌딩)','5F, 44, Jangsin-ro, Gwangsan-gu, Gwangju'],[24,'포항','경상북도 포항시 남구 대이로29번길 5, 덕원빌딩 4층','4F, 5, Daei-ro 29beon-gil, Nam-gu, Pohang-si'],[25,'청주','충청북도 청주시 흥덕구 풍산로 18, 4층 404호','4F, 18, Pungsan-ro, Heungdeok-gu, Cheongju-si'],[26,'강릉','강원도 강릉시 경강로 2106, 5층 (임당동, 경일프라자)','5F, 2106, Gyeonggang-ro, Gangneung-si, Gangwon-do'],[27,'울산','울산광역시 남구 번영로 172, 2층','2F, 172, Beonyeong-ro, Nam-gu, Ulsan, Korea'],[28,'전주','전라북도 전주시 완산구 홍산남로 48, 3층 (효자동2가)','3F, 48, Hongsan-ro, Wansan-gu, Jeonju-si']];
+var ecv=[{t:1,f:0,e2:0,hj:0},{t:1,f:1,e2:0,hj:0},{t:1,f:0,e2:1,hj:0},{t:1,f:0,e2:0,hj:1}];
+var scv=[{t:1,f:0,e2:0},{t:0,f:0,e2:0},{t:0,f:1,e2:0},{t:1,f:1,e2:0},{t:1,f:0,e2:1}];
+var FF="OKFont,'Apple SD Gothic Neo',sans-serif";
+var FG="'Apple Gothic','Apple SD Gothic Neo',Dotum,sans-serif";
+
+function el(id){return document.getElementById(id);}
+function gv(id){var e=el(id);return e&&e.value?e.value:'';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(m){var t=el('toast');t.textContent=m;t.className='toast show';setTimeout(function(){t.className='toast';},2500);}
+
+/* ── OKFont @font-face CSS 추출 (다운로드 시 SVG/JPG에 폰트 임베딩용) ──
+   withAliases=true면 배경 SVG의 CSS가 참조하는 OTOKFontL/M/B 별칭도 함께 생성한다.
+   (downloadSVG/buildSVGForDownload/downloadJPG 3곳에서 중복 정의되어 있던 것을 통합) */
+function getFontCSS(withAliases){
+  var styles=document.querySelectorAll('style');
+  for(var i=0;i<styles.length;i++){
+    var txt=styles[i].textContent||'';
+    if(txt.indexOf('@font-face')>=0){
+      var result='',srcs={},pos=0;
+      while(true){
+        var s=txt.indexOf('@font-face{',pos);if(s<0)break;
+        var e=txt.indexOf("');}",s);if(e<0)break;
+        var block=txt.slice(s,e+4);
+        result+=block;
+        if(withAliases){
+          var wm=block.match(/font-weight:(\d+)/);
+          var sm=block.match(/src:url\('([^']+)'\)/);
+          if(wm&&sm) srcs[wm[1]]=sm[1];
+        }
+        pos=e+4;
+      }
+      if(result){
+        if(withAliases){
+          /* OTOKFontL/M/B = 배경 SVG CSS가 참조하는 폰트 이름 */
+          [['OTOKFontL','300'],['OTOKFontM','500'],['OTOKFontB','700']].forEach(function(a){
+            if(srcs[a[1]]) result+="@font-face{font-family:'"+a[0]+"';src:url('"+srcs[a[1]]+"') format('woff2');}";
+          });
+        }
+        return result;
+      }
+    }
+  }
+  return '';
+}
+
+/* ── NAVIGATION ─────────────────── */
+function nav(page){
+  S.page=page;
+  document.querySelectorAll('.pg').forEach(function(e){e.classList.remove('act');});
+  el('pg-'+page).classList.add('act');
+  ['main','template','info','download'].forEach(function(p){
+    var b=el('nb-'+p); if(b) b.className=p===page?'st on':'st';
+  });
+  window.scrollTo(0,0);
+  if(page==='info') setTimeout(upv,150);
+  if(page==='download'){var lb=el('dl-sz-label');if(lb)lb.textContent=S.type==='exec'?'90×50mm':'85×55mm';setTimeout(renderDownloadPreview,150);}
+  autoSave();
+}
+
+/* ── TEMPLATE PAGE ──────────────── */
+function selExec(){
+  S.type='exec';
+  el('tc-exec').className='tc on'; el('tc-staff').className='tc';
+  el('aff-sec').style.display='none'; S.aff=null;
+  setTimeout(function(){nav('info');setInfoType('exec');},280);
+}
+function selStaff(){
+  S.type='staff'; el('tc-staff').className='tc on'; el('tc-exec').className='tc';
+  el('aff-sec').style.display='block';
+}
+function selAff(el2,name){
+  S.aff=name;
+  document.querySelectorAll('.aff').forEach(function(b){b.className='aff';});
+  el2.className='aff on';
+  /* f-co-s select와 동기화 */
+  var sel=el('f-co-s');
+  if(sel){
+    for(var i=0;i<sel.options.length;i++){
+      if(sel.options[i].value===name){sel.selectedIndex=i;break;}
+    }
+    el('f-site-s').value=siteMap[name]||defSite;
+  }
+  upv();
+}
+function goNextTemplate(){
+  if(S.type==='staff'&&!S.aff){showToast('계열사를 선택해주세요.');return;}
+  if(!S.type){showToast('명함 종류를 선택해주세요.');return;}
+  nav('info'); setInfoType(S.type);
+  if(S.type==='staff'&&S.aff){var sel=el('f-co-s');if(sel){sel.value=S.aff;onStaffCoCh();}}
+}
+
+/* ── INFO PAGE ───────────────────── */
+function setInfoType(t){
+  S.type=t;
+  el('tt-exec').className=t==='exec'?'tt on':'tt';
+  el('tt-staff').className=t==='staff'?'tt on':'tt';
+  el('ct-exec-sec').style.display=t==='exec'?'block':'none';
+  el('ct-staff-sec').style.display=t==='staff'?'block':'none';
+  el('exec-fields').style.display=t==='exec'?'block':'none';
+  el('staff-fields').style.display=t==='staff'?'block':'none';
+  el('p-sz').textContent=t==='exec'?'90×50mm':'85×55mm';
+  applyCV(); upv();
+}
+function setExT(n){S.eType=n;for(var i=1;i<=4;i++) el('ec'+i).className=(i===n)?'ct on':'ct';applyCV();upv();}
+function setStT(n){S.sType=n;for(var i=1;i<=5;i++) el('sc'+i).className=(i===n)?'ct on':'ct';applyCV();upv();}
+function applyCV(){
+  var v=S.type==='exec'?ecv[S.eType-1]:scv[S.sType-1];
+  el('tel-row').style.display=v.t?'':'none';
+  el('fax-row').style.display=v.f?'':'none';
+  el('e2-row').style.display=v.e2?'':'none';
+  el('hj-row').style.display=(S.type==='exec'&&v.hj)?'':'none';
+}
+function onExecCoCh(){var kr=gv('f-co-e');var f=execCoMap.filter(function(c){return c[0]===kr;})[0];el('f-co-e-en').value=f?f[1]:'';upv();}
+function onStaffCoCh(){
+  var co=gv('f-co-s');
+  if(co) S.aff=co;
+  el('f-site-s').value=co?(siteMap[co]||defSite):'';
+  /* aff 버튼 동기화 */
+  document.querySelectorAll('.aff').forEach(function(b){
+    b.className=(b.textContent.trim()===co)?'aff on':'aff';
+  });
+  upv();
+}
+function onTitleCh(){var kr=gv('f-ts-kr');var f=tMap.filter(function(t){return t[0]===kr;})[0];if(f) el('f-ts-en').value=f[1];upv();}
+function onEmlCh(){
+  var idEl=el('f-eml-id'), domEl=el('f-eml-domain'), customEl=el('f-eml-custom'), hidEl=el('f-eml');
+  if(!idEl||!domEl||!hidEl) return;
+  if(domEl.value==='custom'){
+    if(customEl) customEl.style.display='';
+  } else {
+    if(customEl) customEl.style.display='none';
+  }
+  var id=idEl.value.trim();
+  var domain=(domEl.value==='custom')?(customEl?customEl.value.trim():''):domEl.value;
+  hidEl.value=(id&&domain)?(id+'@'+domain):'';
+  upv();
+}
+function onEm2Ch(){
+  var idEl=el('f-em2-id'), domEl=el('f-em2-domain'), customEl=el('f-em2-custom'), hidEl=el('f-em2');
+  if(!idEl||!domEl||!hidEl) return;
+  /* 직접입력 선택 시 custom input 표시 */
+  if(domEl.value==='custom'){
+    if(customEl) customEl.style.display='';
+  } else {
+    if(customEl) customEl.style.display='none';
+  }
+  var id=idEl.value.trim();
+  var domain=(domEl.value==='custom')?(customEl?customEl.value.trim():''):domEl.value;
+  hidEl.value=(id&&domain)?(id+'@'+domain):'';
+  upv();
+}
+function onLocCh(){
+  var idx=gv('f-loc');
+  if(!idx){el('loc-info').style.display='none';}
+  else{var l=locs[parseInt(idx)];el('loc-kr').textContent=l[2];el('loc-en').textContent=l[3];el('loc-info').style.display='block';}
+  upv();
+}
+function getAddr(){
+  var idx=gv('f-loc');
+  if(!idx) return{kr:'서울특별시 중구 세종대로39, 10층 (남대문로4가, 상공회의소)',en:'10F, 39, Sejong-daero, Jung-gu, Seoul, Korea'};
+  var l=locs[parseInt(idx)]; return{kr:l[2],en:l[3]};
+}
+function collectFormData(forExport){
+  var addr=getAddr();
+  /* 각 DOM 필드의 실제 입력 여부 (비어있으면 false) */
+  function filled(fid){var e=el(fid);if(!e)return false;var v=e.value.trim();if(!v)return false;var ph=e.placeholder||'';return v!==ph;}
+  /* [수정] 미리보기는 예시값(fallback)을 계속 보여주되, 실제 다운로드(forExport=true) 시에는
+     입력 안 한 필드를 예시값 대신 빈 문자열로 내보냄 — 완성된 파일에 "김읏맨" 같은
+     샘플 텍스트가 그대로 찍혀 나가지 않도록 함.
+     계열사 선택(coKr/coEn/staffCoKr/website)은 배경·로고 매칭에 쓰이는 구조적 값이라
+     forExport에도 그대로 fallback 유지 (비워두면 카드 자체가 어떤 계열사인지 알 수 없음) */
+  function fv(id,fallback){var v=gv(id);return forExport?v:(v||fallback);}
+  S.d={
+    nameKr:fv('f-nkr','김읏맨'), nameEn:fv('f-nen','OKMAN KIM'), nameHj:fv('f-nhj','金邑萬'),
+    coKr:gv('f-co-e')||'계열사', coEn:gv('f-co-e-en')||'Company',
+    titleKr:fv('f-tkr','이사'), titleEn:fv('f-ten','Advisor'),
+    deptKr:fv('f-dkr','경영관리본부'), deptEn:fv('f-den','Business Management Division'),
+    staffCoKr:gv('f-co-s')||'OK저축은행',
+    staffDeptKr:fv('f-ds-kr','그래픽디자인팀'), staffDeptEn:fv('f-ds-en','Graphic Design Team'),
+    staffTitleKr:fv('f-ts-kr','팀장'), staffTitleEn:fv('f-ts-en','Team Manager'),
+    tel:fv('f-tel','00-0000-0000'), fax:fv('f-fax','00-0000-0000'),
+    mobile:fv('f-mob','010-0000-0000'),
+    email:fv('f-eml','0000000@okfngroup.com'), email2:fv('f-em2','name@gmail.com'),
+    addrKr:addr.kr, addrEn:addr.en,
+    website:gv('f-site-s')||(siteMap[gv('f-co-s')]||defSite),
+    type:S.type, eType:S.eType, sType:S.sType,
+    /* 색상 판단용 입력 여부 플래그 */
+    _fNameKr:filled('f-nkr'), _fNameEn:filled('f-nen'), _fNameHj:filled('f-nhj'),
+    _fCo:filled('f-co-e'), _fDept:filled('f-dkr'), _fTitle:filled('f-tkr'),
+    _fDeptEn:filled('f-den'), _fTitleEn:filled('f-ten'),
+    _fTel:filled('f-tel'), _fFax:filled('f-fax'), _fMob:filled('f-mob'),
+    _fEml:filled('f-eml'), _fEm2:filled('f-em2-id')||filled('f-em2'),
+    _fLoc:filled('f-loc'),
+    /* 직원용 플래그 */
+    _fNameKrS:filled('f-nkr'),
+    _fDeptKrS:filled('f-ds-kr'), _fTitleKrS:filled('f-ts-kr'),
+    _fSiteS:filled('f-site-s')||!!gv('f-site-s')
+  };
+}
+function goToDownload(){collectFormData();nav('download');}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SVG CARD PREVIEW
+   viewBox="0 0 90 50" (mm 단위) → 브라우저가 자동으로 9:5 비율 유지
+   logos/icons는 data URI로 <image> 태그에 삽입
+   ───────────────────────────────────────────────────────────────────────── */
+function svgT(x,y,ff,fs,fw,fill,anchor,content,extra){
+  var a=anchor?' text-anchor="'+anchor+'"':'';
+  var ex=extra||'';
+  return '<text x="'+x+'" y="'+y+'" font-family="'+ff+'" font-size="'+fs+'" font-weight="'+fw+'" fill="'+fill+'"'+a+ex+'>'+content+'</text>';
+}
+
+function buildExecFrontSVG(d){
+  var v=ecv[S.eType-1];
+
+  /* ── 연락처 행 구성 ──────────────────────────────────────
+     배경 SVG viewBox: 0 0 255.2 141.9
+     라벨 x=16, 값 x=49.6, 시작 y=86, 행 간격 10.5
+  ──────────────────────────────────────────────────────── */
+  var rows=[];
+  if(v.e2){
+    rows.push({lb:'Tel',    val:d.tel,    fid:'f-tel'});
+    rows.push({lb:'Mobile', val:d.mobile, fid:'f-mob'});
+    rows.push({lb:'E-mail', val:d.email,  fid:'f-eml'});
+    rows.push({lb:'',       val:d.email2, fid:'f-em2'});
+  } else if(v.f){
+    rows.push({lb:'Tel',    val:d.tel,    fid:'f-tel'});
+    rows.push({lb:'Fax',    val:d.fax,    fid:'f-fax'});
+    rows.push({lb:'Mobile', val:d.mobile, fid:'f-mob'});
+    rows.push({lb:'E-mail', val:d.email,  fid:'f-eml'});
+  } else {
+    rows.push({lb:'Tel',    val:d.tel,    fid:'f-tel'});
+    rows.push({lb:'Mobile', val:d.mobile, fid:'f-mob'});
+    rows.push({lb:'E-mail', val:d.email,  fid:'f-eml'});
+  }
+
+  var sy=86, gap=10.5;
+  /* 라벨 색상: 해당 값 입력 여부에 따라 진한/연한 오렌지 */
+  function lbStFor(fid){
+    /* 라벨(Tel/Fax/Mobile/E-mail)은 항상 진한 오렌지 - 고정 레이블이므로 */
+    return ' font-family="'+FF+'" font-size="8.5" font-weight="500" letter-spacing="-0.08" fill="#FF571F"';
+  }
+  var lbSt=' font-family="'+FF+'" font-size="8.5" font-weight="500" letter-spacing="-0.08" fill="#FF571F"';
+
+  /* ── 실제 입력 여부에 따라 색상 분기 ──────────────────── */
+  function valSt(fid){
+    /* 연락처 값은 기본값이어도 항상 진회색으로 표시 */
+    return ' font-family="'+FF+'" font-size="8.5" font-weight="500" letter-spacing="-0.08" fill="#3f3b3a"';
+  }
+  function nameSt(fid,sz,wt){
+    var el2=el(fid);
+    var hasInput=(el2&&el2.value&&el2.value.trim()!=='');
+    return ' font-family="'+FF+'" font-size="'+sz+'" font-weight="'+(hasInput?wt:'300')+'" letter-spacing="-0.15" fill="'+(hasInput?'#3f3b3a':'#c0c0c0')+'"';
+  }
+
+  var cRows='';
+  rows.forEach(function(r,i){
+    var ry=sy+i*gap;
+    if((v.f||v.e2) && r.lb){
+      cRows+='<text transform="translate(16 '+ry+')"'+lbStFor(r.fid)+'>'+r.lb+'</text>';
+    }
+    cRows+='<text transform="translate(49.6 '+ry+')"'+valSt(r.fid)+'>'+esc(r.val||'')+'</text>';
+  });
+
+  /* 주소 y */
+  var lastY=sy+(rows.length-1)*gap;
+  var adY=127.9;
+  if(lastY+10>adY) adY=lastY+10;
+
+  /* ── 커버 rect ─────────────────────────────────────────── */
+  var nameCover=
+    '<rect x="105" y="43" width="137" height="21" fill="#ffffff" class="cover-rect"/>'+
+    '<rect x="105" y="64" width="137" height="16" fill="#ffffff" class="cover-rect"/>';
+  var ctCover;
+  if(v.f||v.e2){
+    ctCover='<rect x="14" y="74" width="232" height="68" fill="#ffffff" class="cover-rect"/>';
+  } else {
+    ctCover=
+      '<rect x="49.6" y="74" width="196" height="48" fill="#ffffff" class="cover-rect"/>'+
+      '<rect x="14"   y="118" width="232" height="24" fill="#ffffff" class="cover-rect"/>';
+  }
+
+  /* ── 이름 / 계열사 ────────────────────────────────────── */
+  var spcName=spaceKrName(d.nameKr);
+  var coStr=esc(d.coKr)+' │ '+esc(d.deptKr)+' │ '+esc(d.titleKr);
+
+  /* 이름 색상: 입력 여부 */
+  var nameColor='#3f3b3a';
+  var nameWeight='500';
+
+  /* 계열사│부서│직함 색상: DOM value가 있고 placeholder와 다를 때만 진회색 */
+  /* 계열사│부서│직함: collectFormData 플래그로 색상 결정 */
+  var coColor=(d._fCo||d._fDept||d._fTitle)?'#3f3b3a':'#c0c0c0';
+  var coWeight='300';
+
+  /* ── 유형4: 한자 표기 ─────────────────────────────────── */
+  var hjSVG='';
+  if(v.hj){
+    var hjEl=el('f-nhj');
+    var hjHasInput=(hjEl&&hjEl.value&&hjEl.value.trim()!=='');
+    var hjColor=hjHasInput?'#3f3b3a':'#c0c0c0';
+    var hjWeight=hjHasInput?'700':'300';
+    /* 유형4: 이름 x를 왼쪽으로 밀어 한자 공간 확보
+       SVG 기준: 이름 x=156.89(text-anchor end면 우측 x=241에서), 한자 x=209.54, y=58.45 */
+    hjSVG='<text transform="translate(241 58.45)" text-anchor="end"'
+      +' font-family="\'Nanum Gothic\',\'NanumGothic\',sans-serif"'
+      +' font-size="10" font-weight="'+hjWeight+'" letter-spacing="-0.01em"'
+      +' fill="'+hjColor+'">'+esc(d.nameHj||'')+'</text>';
+  }
+
+  /* 이름 x 위치: 유형4는 한자 공간 위해 왼쪽으로 조정
+     SVG에서 이름 translate.x=156.89, 한자 x=209.54
+     text-anchor=end 방식이므로 끝점 고정(x=241)에서
+     유형4는 한자가 y=58.45에 따로 붙으므로 이름 끝을 x=207로 당김 */
+  var nameEndX=v.hj?'207':'241';
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255.2 141.9" style="width:100%;height:auto;display:block">'
+    +'<image href="'+EXEC_FRONT_BG_URI+'" x="0" y="0" width="255.2" height="141.9"/>'
+    /* [로고 분리] 실제 로고 파일 확보 후 x/y/width/height 좌표는 디자인에 맞게 조정 필요 */
+    +'<image href="'+EXEC_FRONT_LOGO_URI+'" x="16" y="14" width="60" height="21"/>'
+    +nameCover
+    +ctCover
+    +'<text transform="translate('+nameEndX+' 57.2)" text-anchor="end" font-family="'+FF+'" font-size="15" font-weight="'+nameWeight+'" letter-spacing="-0.15" fill="'+nameColor+'">'+esc(spcName)+'</text>'
+    +hjSVG
+    +'<text transform="translate(241 72.2)" text-anchor="end" font-family="'+FF+'" font-size="9" font-weight="300" letter-spacing="-0.36" fill="'+coColor+'">'+coStr+'</text>'
+    +cRows
+    +'<text transform="translate(16 '+adY+')" font-family="'+FF+'" font-size="6" font-weight="300" letter-spacing="-0.24" fill="#3f3b3a">'+esc(d.addrKr)+'</text>'
+    /* 읏 아이콘 (우하단 고정 - 배경 SVG의 cls-12 위치에 맞춤) */
+    +'<image href="'+ICON_EUT_URI+'" x="225.4" y="99.4" width="19.7" height="27.0"/>'
+    +'</svg>';
+}
+function buildExecBackSVG(d){
+  /* 입력 여부에 따라 색상/굵기 분기 */
+  function hasVal(fid){var e=el(fid);return e&&e.value&&e.value.trim()!=='';}
+  var nameEnColor='#3f3b3a';
+  var nameEnWeight='500';
+  /* 계열사│부서│직함 색상: collectFormData 플래그 사용 */
+  var coColor=(d._fCo||d._fDept||d._fTitle)?'#3f3b3a':'#c0c0c0';
+  var coEn=d.coEn||''; var deptEn=d.deptEn||''; var titleEn=d.titleEn||'';
+  var nmSt=' font-family="'+FF+'" font-size="15" font-weight="'+nameEnWeight+'" letter-spacing="-0.15" fill="'+nameEnColor+'"';
+  var cSt =' font-family="'+FF+'" font-size="9"  font-weight="300" letter-spacing="-0.225" fill="'+coColor+'"';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255.12 141.73" style="width:100%;height:auto;display:block">'
+    +'<image href="'+EXEC_BACK_BG_URI+'" x="0" y="0" width="255.12" height="141.73"/>'
+    /* [로고 분리] 실제 로고 파일 확보 후 x/y/width/height 좌표는 디자인에 맞게 조정 필요 */
+    +'<image href="'+EXEC_BACK_LOGO_URI+'" x="14" y="14" width="60" height="21"/>'
+    +'<rect x="14" y="43" width="227" height="21" fill="#ffffff" class="cover-rect"/>'
+    +'<rect x="14" y="64" width="227" height="26" fill="#ffffff" class="cover-rect"/>'
+    +'<text transform="translate(241 57.1)" text-anchor="end"'+nmSt+'>'+esc(d.nameEn)+'</text>'
+    +'<text transform="translate(241 71.9)" text-anchor="end"'+cSt+'>'+esc(coEn)+'</text>'
+    +'<text transform="translate(241 82.5)" text-anchor="end"'+cSt+'>'+esc(deptEn)+' │ '+esc(titleEn)+'</text>'
+    /* [수정] OK 아이콘 (우측 상단 고정) — 사용자가 올려준 실제 뒷면 목업(img_back_01.svg)에서 아이콘 벡터 path의 실좌표를 역산해서 정확히 맞춤: x≈209.7, y≈9.1, 크기는 icon-ok.svg 원본 그대로(29.6×21.6, 스케일 없음). 이전 우하단 추정 좌표는 틀렸던 것으로 확인되어 수정함. */
+    +'<image href="'+ICON_OK_URI+'" x="209.7" y="9.1" width="29.6" height="21.6"/>'
+    +'</svg>';
+}
+function getStaffLogoInfo(affName){
+  /* [리팩터링] STAFF_AFF_ASSETS 한 곳에서 계열사별 로고 정보를 가져옴.
+     매칭되는 계열사가 없으면 기본값(OK저축은행)으로 대체 */
+  var entry=STAFF_AFF_ASSETS[affName]||STAFF_AFF_ASSETS[STAFF_AFF_DEFAULT];
+  var lo=entry.logo;
+  return {u:lo.u, w:lo.w, h:lo.h, x:(lo.x!=null?lo.x:5.5), y:5};
+}
+function getStaffLogoSVG(affName){
+  /* Original Korean 제거 — 로고 이미지만 반환 */
+  var lo=getStaffLogoInfo(affName);
+  return '<image href="'+lo.u+'" x="'+lo.x+'" y="'+lo.y+'" width="'+lo.w+'" height="'+lo.h+'"/>';
+}
+
+/* 직원용 앞면 계열사별 배경 SVG 매핑 (buildStaffFrontSVG/downloadSVG/downloadJPG 공용)
+   [버그 수정 #6] downloadSVG/downloadJPG가 이 매핑을 쓰지 않고 별도의
+   STAFF_FRONT_FULL_URI 상수를 참조하고 있었음. buildStaffFrontSVG가 실제로
+   그리는 배경(계열사별로 다름)과 값이 달라서, 문자열에서 배경 <image> 태그를
+   찾지 못해 인덱스 계산이 -1이 되어 SVG/캔버스 내용이 통째로 중복되는
+   문제가 있었다. 이제 세 곳 모두 이 함수 하나로 배경을 결정한다. */
+function getStaffFrontBgURI(affName){
+  /* [리팩터링] 배경도 STAFF_AFF_ASSETS 한 곳에서 가져옴 (로고와 동일 소스) */
+  var entry=STAFF_AFF_ASSETS[affName]||STAFF_AFF_ASSETS[STAFF_AFF_DEFAULT];
+  return entry.bg;
+}
+function buildStaffFrontSVG(d){
+  var v=scv[S.sType-1];
+
+  /* 계열사별 배경 SVG, y좌표 결정 */
+  var currentAff=S.aff||d.staffCoKr||'OK저축은행';
+  var bgUri=getStaffFrontBgURI(currentAff);
+  /* [수정] "Original Korean" 문구는 bg 이미지 자체에 포함되므로 더 이상 코드로 그리지 않음 */
+  /* 가이드라인 기준 좌표 (155.91x240.94 SVG ÷ 2.8347) */
+  var yO=({'아프로FnI':{n:29.92,dep:34.15,sy:42.32}}[currentAff])
+        ||{n:33.74,dep:37.98,sy:46.01};
+
+  /* 연락처 행 구성 */
+  var rows=[],sy=yO.sy;
+  if(v.t) rows.push(['T',d.tel,'f-tel']);
+  rows.push(['M',d.mobile,'f-mob']);
+  if(v.f) rows.push(['F',d.fax,'f-fax']);
+  rows.push(['E',d.email,'f-eml']);
+  if(v.e2) rows.push(['',d.email2||'','f-em2']);
+
+  var cRows='';
+  rows.forEach(function(r,i){
+    var ry=sy+i*3.53; /* 가이드라인: 10px÷2.835 */
+    if(r[0]){
+      /* T/M/F/E 모두 흰색 */
+      var lbColor='#ffffff';
+      cRows+=svgT(5.5,ry,FF,'2.65','300',lbColor,null,esc(r[0]),' letter-spacing="-0.01em"');
+    }
+    cRows+=svgT(r[0]?9.25:5.5,ry,FF,'2.65','300','#ffffff',null,esc(r[1]||''),' letter-spacing="-0.01em"');
+  });
+
+  /* 주소 하단 고정 */
+  var adKr1=d.addrKr,adKr2='';
+  var pi=d.addrKr.indexOf('(');
+  if(pi>0){adKr1=d.addrKr.slice(0,pi).trim();adKr2=d.addrKr.slice(pi);}
+  var adEn1=d.addrEn,adEn2='';
+  var lc=d.addrEn.lastIndexOf(',',d.addrEn.length-6);
+  if(lc>8){adEn1=d.addrEn.slice(0,lc+1);adEn2=d.addrEn.slice(lc+2);}
+  /* 주소 y: 연락처 마지막 행 + 8.11 (가이드라인 실측) */
+  var GAP=3.53;
+  var contactEndY=yO.sy+(rows.length-1)*GAP;
+  var K1_Y=contactEndY+8.11;
+  var K2_Y=adKr2?(K1_Y+GAP):K1_Y;
+  var E1_Y=K2_Y+(adKr2?GAP:GAP);
+  var E2_Y=adEn2?(E1_Y+GAP):E1_Y;
+  var addrEndY=adEn2?E2_Y:(adEn1?E1_Y:(adKr2?K2_Y:K1_Y));
+  var W_Y=addrEndY+7.61;
+
+
+  /* 가이드라인: 모든 텍스트는 흰색, 미입력 시 반투명 흰색 */
+  var adColor='#ffffff';
+  var siteColor='#ffffff';
+  var nameColor='#ffffff';
+  var nameWt='700'; /* 국문이름 Bold */
+  var deptColor='#ffffff';
+
+
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 155.91 240.94" style="width:100%;height:auto;display:block">'
+    +'<image href="'+bgUri+'" x="0" y="0" width="155.91" height="240.94"/>'
+    /* [로고 분리] 계열사별 로고를 배경과 별도로 배치 */
+    +getStaffLogoSVG(currentAff)
+    /* 동적 텍스트: scale(2.835)로 기존 55x85 좌표계 유지 */
+    +'<g transform="scale(2.835)">'
+    +svgT(5.5,yO.n,FF,'3.88',nameWt,nameColor,null,spaceKrName(d.nameKr),' letter-spacing="-0.01em"')
+    +svgT(5.5,yO.dep,FF,'2.47','300',deptColor,null,esc(d.staffDeptKr)+'  │  '+esc(d.staffTitleKr),' letter-spacing="-0.05em"')
+    +cRows
+    +svgT(5.5,K1_Y,FF,'2.47','300',adColor,null,esc(adKr1),' letter-spacing="-0.05em"')
+    +(adKr2?svgT(5.5,K2_Y,FF,'2.47','300',adColor,null,esc(adKr2),' letter-spacing="-0.05em"'):'')
+    +svgT(5.5,E1_Y,FF,'2.47','300',adColor,null,esc(adEn1),' letter-spacing="-0.01em"')
+    +(adEn2?svgT(5.5,E2_Y,FF,'2.47','300',adColor,null,esc(adEn2),' letter-spacing="-0.01em"'):'')
+    +svgT(5.1,W_Y,FF,'1.94','500',siteColor,null,esc(d.website),' letter-spacing="-0.01em"')
+    +'</g>'
+    +'</svg>';
+}
+function buildStaffBackSVG(d){
+  /* 영문 소속+직급 */
+  var combined=d.staffDeptEn+' | '+d.staffTitleEn;
+  var bLine1=combined, bLine2='';
+  if(combined.length>28){
+    var midsp=combined.lastIndexOf(' ',Math.floor(combined.length/2)+4);
+    if(midsp>5){bLine1=combined.slice(0,midsp);bLine2=combined.slice(midsp+1);}
+  }
+
+  var W='#ffffff';
+  var nameEnColor=(d._fNameEn||d._fNameKrS)?W:'rgba(255,255,255,0.5)';
+  var deptEnColor=(d._fDeptKrS||d._fTitleKrS)?W:'rgba(255,255,255,0.5)';
+  var siteColor=d._fSiteS?W:'rgba(255,255,255,0.5)';
+  var currentAff=S.aff||d.staffCoKr||'OK저축은행';
+
+  /* 뒷면 스펙 기반 y좌표 (155.91×241.01 → scale(2.8347)로 55×85 좌표 사용) */
+  var nameY=33.74;             /* 영문이름 */
+  var dept1Y=nameY+4.24;       /* 37.98 */
+  var dept2Y=dept1Y+3.53;      /* 41.51 */
+  /* OK금융그룹: 가이드라인 고정 y=53.82mm. 2줄 넘칠 경우 dept2Y 기준으로 밀어줌 */
+  var grpY=bLine2?dept2Y+8.11:dept1Y+15.84;  /* OK금융그룹 텍스트 */
+  var affGAP=3.00;             /* 계열사 행간 8.5pt÷2.835 */
+  var siteY=79.38;
+
+  /* 계열사 목록 줄 */
+  var affLines=[
+    'OK홀딩스대부 \u2502 OK저축은행 \u2502 OK캐피탈 \u2502 OK에이엑스',
+    'OK인베스트먼트파트너스 \u2502 OK벤처스 \u2502 OK넥스트',
+    'OK네트웍스 \u2502 아프로에프앤아이대부 \u2502 아프로신용정보',
+    '엑스인하우징 \u2502 OK Bank Indonesia \u2502 PPCBank',
+    'OK ASSET Indonesia \u2502 부산 OK저축은행 읏맨 프로배구단',
+    'OK읏맨 럭비단 \u2502 OK배\u00B7정 장학재단'
+  ];
+  var affSVG='';
+  for(var i=0;i<affLines.length;i++){
+    affSVG+=svgT(5.5,grpY+3.00+i*affGAP,FF,'1.87','300',W,null,esc(affLines[i]),' letter-spacing="-0.05em"');
+  }
+
+  /* [수정] "Original Korean" 문구는 bg 이미지 자체에 포함되므로 더 이상 코드로 그리지 않음 */
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 155.91 241.01" style="width:100%;height:auto;display:block">'
+    +'<image href="'+STAFF_BACK_BG_URI+'" x="0" y="0" width="155.91" height="241.01"/>'
+    /* [로고 분리] OK금융그룹 로고를 배경과 별도로 배치 */
+    +'<image href="'+STAFF_BACK_LOGO_URI+'" x="5.5" y="5" width="24" height="9.4"/>'
+    +'<g transform="scale(2.8347)">'
+    /* 영문이름: Medium 11pt */
+    +svgT(5.5,nameY,FF,'3.88','500',nameEnColor,null,esc(d.nameEn),' letter-spacing="-0.01em"')
+    /* 영문소속: Light 7pt */
+    +svgT(5.5,dept1Y,FF,'2.47','300',deptEnColor,null,esc(bLine1),' letter-spacing="-0.01em"')
+    +(bLine2?svgT(5.5,dept2Y,FF,'2.47','300',deptEnColor,null,esc(bLine2),' letter-spacing="-0.01em"'):'')
+    /* OK금융그룹 텍스트: Medium 7pt */
+    +svgT(5.5,grpY,FF,'2.47','500',W,null,'OK금융그룹',' letter-spacing="-0.05em"')
+    /* 계열사 목록: Light 5.3pt */
+    +affSVG
+    /* 홈페이지: Medium 5.5pt — 뒷면은 okfngroup.com 고정 */
+    +svgT(5.1,siteY,FF,'1.94','500',siteColor,null,'www.okfngroup.com',' letter-spacing="-0.01em"')
+    +'</g>'
+    +'</svg>';
+}
+
+
+function buildPreviewHTML(){
+  collectFormData(); var d=S.d;
+  var isExec=S.type==='exec';
+  if(isExec){
+    var frontSVG=buildExecFrontSVG(d);
+    var backSVG=buildExecBackSVG(d);
+    return '<div class="pv-face">앞면</div>'
+      +'<div class="card-svg-wrap">'+frontSVG+'</div>'
+      +'<div class="pv-div"></div>'
+      +'<div class="pv-face b">뒷면</div>'
+      +'<div class="card-svg-wrap">'+backSVG+'</div>';
+  } else {
+    var fSVG=buildStaffFrontSVG(d);
+    var bSVG=buildStaffBackSVG(d);
+    var ww='style="width:70%;margin:0 auto"';
+    return '<div class="pv-face">앞면</div>'
+      +'<div class="card-svg-wrap" '+ww+'>'+fSVG+'</div>'
+      +'<div class="pv-div"></div>'
+      +'<div class="pv-face b">뒷면</div>'
+      +'<div class="card-svg-wrap" '+ww+'>'+bSVG+'</div>';
+  }
+}
+function spaceKrName(v){return v.replace(/\s/g,'').split('').join(' ');}
+function upv(){
+  var stage=el('pv-stage');
+  if(stage) stage.innerHTML=buildPreviewHTML();
+}
+function renderDownloadPreview(){
+  collectFormData(); var d=S.d;
+  var stage=el('dl-preview'); if(!stage) return;
+  if(S.type==='exec'){
+    var frontSVG=buildExecFrontSVG(d);
+    var backSVG=buildExecBackSVG(d);
+    stage.innerHTML='<div style="max-width:360px;margin:0 auto">'
+      +'<div class="pv-face">앞면</div>'
+      +'<div class="card-svg-wrap">'+frontSVG+'</div>'
+      +'<div class="pv-div"></div>'
+      +'<div class="pv-face b">뒷면</div>'
+      +'<div class="card-svg-wrap">'+backSVG+'</div>'
+      +'</div>';
+  } else {
+    /* 직원용 4페이지: 앞뒤 나란히, 폭 제한 */
+    var fSVG=buildStaffFrontSVG(d);
+    var bSVG=buildStaffBackSVG(d);
+    stage.innerHTML='<div style="display:flex;gap:12px;justify-content:center">'
+      +'<div style="width:46%;min-width:0">'
+        +'<div class="pv-face">앞면</div>'
+        +'<div class="card-svg-wrap">'+fSVG+'</div>'
+      +'</div>'
+      +'<div style="width:46%;min-width:0">'
+        +'<div class="pv-face">— 뒷면 —</div>'
+        +'<div class="card-svg-wrap">'+bSVG+'</div>'
+      +'</div>'
+    +'</div>';
+  }
+}
+function buildSVGForDownload(face){
+  collectFormData(true); var d=S.d;
+  /* @font-face CSS 추출 — OKFont 임베딩 (공통 getFontCSS() 사용) */
+  var FONT_CSS=getFontCSS();
+  var DEFS=FONT_CSS?('<defs><style>'+FONT_CSS+'</style></defs>\n'):'';
+  var v=S.type==='exec'?ecv[S.eType-1]:scv[S.sType-1];
+  if(S.type==='exec'){
+    if(face==='front'){
+      var rows=[],startY=28.5;
+      if(v.t) rows.push(['Tel',d.tel]);
+      if(v.f) rows.push(['Fax',d.fax]);
+      rows.push(['Mobile',d.mobile]);
+      rows.push(['E-mail',d.email]);
+      if(v.e2) rows.push(['',d.email2||'']);  /* 이메일2: 라벨 없이 들여쓰기 */
+      var cRows='';
+      rows.forEach(function(r,i){
+        var ry=startY+i*3.8;
+        if(r[0]) cRows+=svgT(3,ry,FF,'2.2','700','#FF571F',null,esc(r[0]));
+        /* 이메일2는 라벨 없으므로 x를 14 대신 18로 살짝 들여쓰기 */
+        cRows+=svgT(r[0]?14:18,ry,FF,'2.2','500','#3f3b3a',null,esc(r[1]||''));
+      });
+      var nameY=v.hj?19.5:21.5;
+      var hjSVG=v.hj&&d.nameHj?svgT(87,nameY+4.5,FG,'2.2','400','#777','end',esc(d.nameHj)):'';
+      var deptY=v.hj&&d.nameHj?nameY+8.5:nameY+4.5;
+      return '<?xml version="1.0" encoding="UTF-8"?>\n'
+        +'<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 90 50">\n'
+        +DEFS+'<rect width="90" height="50" fill="#ffffff"/>\n'
+        +'<image href="'+LOGO_FRONT_URI+'" x="3" y="2.5" width="27" height="9.56"/>\n'
+        +svgT(3,14.5,FF,'2.5','700','#3f3b3a',null,'Original Korean',' font-style="italic"')+'\n'
+        +svgT(87,nameY,FF,'5.8','700','#3f3b3a','end',esc(d.nameKr),' letter-spacing="0.04em"')+'\n'
+        +hjSVG+'\n'
+        +svgT(87,deptY,FF,'2.2','500','#3f3b3a','end',esc(d.coKr)+' | '+esc(d.deptKr)+' | '+esc(d.titleKr))+'\n'
+        +cRows+'\n'
+        +'<image href="'+ICON_EUT_URI+'" x="77.5" y="33.5" width="7" height="9.6"/>\n'
+        +svgT(3,47.5,FF,'1.6','300','#aaaaaa',null,esc(d.addrKr))+'\n'
+        +'</svg>';
+    } else {
+      return '<?xml version="1.0" encoding="UTF-8"?>\n'
+        +'<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 90 50">\n'
+        +DEFS+'<rect width="90" height="50" fill="#ffffff"/>\n'
+        +'<image href="'+LOGO_BACK_URI+'" x="3" y="2.5" width="28" height="10.65"/>\n'
+        +'<image href="'+ICON_OK_URI+'" x="73" y="2.5" width="13" height="9.47"/>\n'
+        +svgT(87,24,FF,'6','700','#3f3b3a','end',esc(d.nameEn),' letter-spacing="0.06em"')+'\n'
+        +svgT(87,28.5,FF,'2.3','500','#3f3b3a','end',esc(d.coEn)+' | '+esc(d.deptEn))+'\n'
+        +svgT(87,32.5,FF,'2.3','500','#3f3b3a','end',esc(d.titleEn))+'\n'
+        +svgT(3,39,FF,'1.8','300','#aaaaaa',null,'OK\ud648\ub529\uc2a4 | OK\uc800\ucd95\uc740\ud589 | OK\uce90\ud53c\ud0c8 | OK\uc5d0\uc774\uc5d1\uc2a4 | OK\uc778\ubca0\uc2a4\ud2b8\uba3c\ud2b8\ud30c\ud2b8\ub108\uc2a4 | OK\ubca4\ucc98\uc2a4 | OK\ub2c9\uc2a4\ud2b8')+'\n'
+        +svgT(3,42.5,FF,'1.8','300','#aaaaaa',null,'OK\ub124\ud2b8\uc6cc\ud06c\uc2a4 | \uc544\ud504\ub85c\uc5d0\ud504\uc564\uc544\uc774 | \uc544\ud504\ub85c\uc2e0\uc6a9\uc815\ubcf4 | \uc5d1\uc2a4\uc778\ud558\uc6b0\uc9d5 | PPCBank | OK Bank Indonesia')+'\n'
+        +svgT(3,46,FF,'1.8','300','#aaaaaa',null,'OK ASSET Indonesia | \ubd80\uc0b0OK\uc800\ucd95\uc740\ud589 | \uc637\ub9e8 \ud504\ub85c\ubc30\uad6c\ub2e8 | OK\uc637\ub9e8 \ub7ed\ube44\ub2e8 | OK\ubc30\u00b7\uc815 \uc7a5\ud559\uc7ac\ub2e8')+'\n'
+        +'</svg>';
+    }
+  } else {
+    /* staff */
+    if(face==='front'){
+      var sv=scv[S.sType-1]; var sr=[],sy2=26;
+      if(sv.t) sr.push(['T',d.tel]);sr.push(['M',d.mobile]);if(sv.f) sr.push(['F',d.fax]);
+      sr.push(['E',d.email]);if(sv.e2) sr.push(['',d.email2||'']);
+      var sRows='';sr.forEach(function(r,i){var ry=sy2+i*4;sRows+=svgT(5,ry,FF,'2.2','700','#f5aa00',null,esc(r[0]))+svgT(10,ry,FF,'2.2','300','rgba(255,255,255,0.65)',null,esc(r[1]||''));});
+      return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="55mm" height="85mm" viewBox="0 0 55 85">\n'
+        +DEFS+'<rect width="55" height="85" fill="#3A2F31"/>\n'
+        +svgT(5,9,FF,'2.2','700','#ffffff',null,'OK<tspan fill="#f5aa00">!</tspan> \uae08\uc735\uadf8\ub8f9')+'\n'
+        +svgT(5,12.5,FF,'1.6','300','rgba(255,255,255,0.4)',null,esc(d.staffDeptKr))+'\n'
+        +svgT(50,10,FF,'4','900','rgba(255,255,255,0.18)','end','ok')+'\n'
+        +svgT(5,22,FF,'4','700','#ffffff',null,esc(d.nameKr),' letter-spacing="0.04em"')+'\n'
+        +svgT(5,25.5,FF,'1.8','300','rgba(255,255,255,0.5)',null,esc(d.staffDeptKr)+' | '+esc(d.staffTitleKr))+'\n'
+        +sRows+'\n'
+        +svgT(5,78,FF,'1.4','300','rgba(255,255,255,0.35)',null,esc(d.addrKr))+'\n'
+        +svgT(5,81.5,FF,'1.4','300','rgba(255,255,255,0.35)',null,esc(d.addrEn))+'\n'
+        +svgT(5,84.5,FF,'1.6','700','rgba(255,255,255,0.5)',null,esc(d.website))+'\n'
+        +'</svg>';
+    } else {
+      return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="55mm" height="85mm" viewBox="0 0 55 85">\n'
+        +DEFS+'<rect width="55" height="85" fill="#FF571F"/>\n'
+        +svgT(5,18,FF,'10','900','rgba(255,255,255,0.2)',null,'ok')+'\n'
+        +svgT(5,22.5,FF,'2.2','700','#ffffff',null,'OK! \uae08\uc735\uadf8\ub8f9')+'\n'
+        +svgT(5,34,FF,'3.5','700','#ffffff',null,esc(d.nameEn),' letter-spacing="0.05em"')+'\n'
+        +svgT(5,38,FF,'1.8','300','rgba(255,255,255,0.65)',null,esc(d.staffDeptEn)+' \u00b7 '+esc(d.staffTitleEn))+'\n'
+        +svgT(5,76,FF,'1.6','300','rgba(255,255,255,0.5)',null,'M.'+esc(d.mobile))+'\n'
+        +svgT(5,79.5,FF,'1.6','300','rgba(255,255,255,0.5)',null,esc(d.email))+'\n'
+        +'</svg>';
+    }
+  }
+}
+async function downloadSVG(face){
+  collectFormData(true); var d=S.d;
+
+  /* ── 배경/아이콘 SVG 파일을 fetch로 읽어 내부 요소만 추출 ─────
+     [외부 파일 분리] 예전에는 base64 데이터 URI를 atob()로 디코딩했지만,
+     이제 LOGO, EXEC, STAFF 계열 변수들이 실제 파일 경로(logo 폴더의 .svg)이므로
+     fetch()로 파일 내용을 읽어온다. 파일이 아직 없거나 로드에 실패하면
+     빈 문자열을 반환해서, 원래의 <image href="..."> 참조를 그대로 남겨두는
+     기존 방식으로 안전하게 되돌아간다(내보낸 SVG가 깨지지 않음). */
+  async function svgToInner(url, prefix, removeText){
+    var decoded='';
+    try{
+      var res=await fetch(url);
+      if(!res.ok) return '';
+      decoded=await res.text();
+    }catch(e){return '';}
+    var inner=decoded
+      .replace(/<\?xml[^>]*\?>/g,'')
+      .replace(/<svg[^>]*>/,'')
+      .replace(/<\/svg>\s*$/,'')
+      .trim();
+    if(removeText){
+      /* 배경 SVG의 모든 텍스트 제거 (슬로건은 별도 동적 추가) */
+      inner=inner.replace(/<text[\s\S]*?<\/text>/g,'');
+    }
+    if(prefix){
+      inner=inner.replace(/\.cls-([\w-]+)/g,'.'+prefix+'-cls-$1');
+      inner=inner.replace(/class="cls-([\w-]+)"/g,'class="'+prefix+'-cls-$1"');
+    }
+    return inner;
+  }
+
+  /* ── 규격 ──────────────────────────────────────────────────── */
+  var physW=(S.type==='exec')?90:55;
+  var physH=(S.type==='exec')?50:85;
+
+  /* ── 미리보기 SVG 생성 ─────────────────────────────────────── */
+  var svg;
+  if(S.type==='exec'){
+    svg=(face==='front')?buildExecFrontSVG(d):buildExecBackSVG(d);
+  } else {
+    svg=(face==='front')?buildStaffFrontSVG(d):buildStaffBackSVG(d);
+  }
+
+  /* ── STEP 1: 배경 <image> → inline <g> 교체 ───────────────── */
+  /* [버그 수정] staff front는 계열사별로 배경이 다르므로(getStaffFrontBgURI),
+     고정된 STAFF_FRONT_FULL_URI를 쓰면 실제 svg 안의 <image> href와 값이
+     달라 아래 indexOf가 못 찾고(-1) 문자열이 통째로 중복 삽입되는 문제가 있었음. */
+  var bgURI=(S.type==='exec')
+    ?((face==='front')?EXEC_FRONT_BG_URI:EXEC_BACK_BG_URI)
+    :((face==='front')?getStaffFrontBgURI(S.aff||d.staffCoKr||'OK저축은행'):STAFF_BACK_BG_URI);
+  var bgInner=await svgToInner(bgURI,'bg',true);
+  if(bgInner){
+    var bgSearch='<image href="'+bgURI+'"';
+    var bgS=svg.indexOf(bgSearch),bgE=svg.indexOf('/>',bgS)+2;
+    svg=svg.slice(0,bgS)+'<g id="bg-layer">'+bgInner+'</g>'+svg.slice(bgE);
+  }
+
+  /* ── STEP 2: 커버 rect 제거 ────────────────────────────────── */
+  /* class="cover-rect"로 표시된 요소만 제거한다.
+     예전에는 fill="#ffffff"인 모든 rect를 제거했는데, 배경 SVG(bg-layer)를
+     인라인한 뒤라서 배경 디자인 안에 흰색 rect가 있으면 같이 삭제되는
+     위험이 있었음. */
+  svg=svg.replace(/<rect[^>]*class="cover-rect"[^>]*\/>/g,'');
+
+  /* ── STEP 3: 로고 <image> → inline <svg> 교체 ─────────────────
+     [로고 분리] bg와 별도로 배치된 계열사/유형별 로고를 원본 viewBox를 유지한
+     nested <svg>로 감싸 인라인 처리한다 (원본 비율과 무관하게 안전하게 스케일됨). */
+  async function svgToNested(url,x,y,w,h,prefix){
+    var decoded='';
+    try{ var res=await fetch(url); if(!res.ok) return ''; decoded=await res.text(); }catch(e){ return ''; }
+    var vbMatch=decoded.match(/viewBox="([^"]+)"/);
+    var vb=vbMatch?vbMatch[1]:('0 0 '+w+' '+h);
+    var inner=decoded.replace(/<\?xml[^>]*\?>/g,'').replace(/<svg[^>]*>/,'').replace(/<\/svg>\s*$/,'').trim();
+    if(prefix){
+      inner=inner.replace(/\.cls-([\w-]+)/g,'.'+prefix+'-cls-$1');
+      inner=inner.replace(/class="cls-([\w-]+)"/g,'class="'+prefix+'-cls-$1"');
+    }
+    if(!inner) return '';
+    return '<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" viewBox="'+vb+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
+  }
+  var logoURI=(S.type==='exec')
+    ?((face==='front')?EXEC_FRONT_LOGO_URI:EXEC_BACK_LOGO_URI)
+    :((face==='front')?getStaffLogoInfo(S.aff||d.staffCoKr||'OK저축은행').u:STAFF_BACK_LOGO_URI);
+  var logoSearch='<image href="'+logoURI+'"';
+  var logoS=svg.indexOf(logoSearch);
+  if(logoS>=0){
+    var logoE=svg.indexOf('/>',logoS)+2;
+    var logoTag=svg.slice(logoS,logoE);
+    var lx=parseFloat((logoTag.match(/\bx="([-\d.]+)"/)||['','0'])[1]);
+    var ly=parseFloat((logoTag.match(/\by="([-\d.]+)"/)||['','0'])[1]);
+    var lw=parseFloat((logoTag.match(/width="([\d.]+)"/)||['','0'])[1]);
+    var lh=parseFloat((logoTag.match(/height="([\d.]+)"/)||['','0'])[1]);
+    var logoNested=await svgToNested(logoURI,lx,ly,lw,lh,'logo');
+    if(logoNested) svg=svg.slice(0,logoS)+logoNested+svg.slice(logoE);
+  }
+
+  /* ── STEP 4: 읏 아이콘 <image> → inline <g> ───────────────── */
+  if(S.type==='exec'&&face==='front'&&ICON_EUT_URI){
+    var eutSearch='<image href="'+ICON_EUT_URI+'"';
+    var eutS=svg.indexOf(eutSearch);
+    if(eutS>=0){
+      var eutE=svg.indexOf('/>',eutS)+2;
+      var eutTag=svg.slice(eutS,eutE);
+      var ex=parseFloat((eutTag.match(/\bx="([\d.]+)"/)  ||['','0'])[1]);
+      var ey=parseFloat((eutTag.match(/\by="([\d.]+)"/)  ||['','0'])[1]);
+      var ew=parseFloat((eutTag.match(/width="([\d.]+)"/) ||['','0'])[1]);
+      var escale=(ew/21.6).toFixed(4);
+      var eutInner=await svgToInner(ICON_EUT_URI,'eut',false);
+      if(eutInner){
+        svg=svg.slice(0,eutS)+
+          '<g id="eut-icon" transform="translate('+ex+','+ey+') scale('+escale+')">'+eutInner+'</g>'+
+          svg.slice(eutE);
+      }
+    }
+  }
+
+  /* ── STEP 5: <svg> style → width/height mm ─────────────────── */
+  svg=svg.replace(/<svg([^>]*)style="[^"]*"([^>]*)>/,
+    '<svg$1$2 width="'+physW+'mm" height="'+physH+'mm">');
+
+  /* ── STEP 6: 루트 <svg> 바로 다음에 @font-face defs 주입 ───── */
+  var FONT_CSS=getFontCSS(true);
+  if(FONT_CSS){
+    /* 루트 svg 태그 끝 위치 찾아서 그 뒤에 삽입 (bg-layer defs와 별개) */
+    var svgTagEnd=svg.indexOf('>')+1;
+    svg=svg.slice(0,svgTagEnd)+'<defs><style>'+FONT_CSS+'
+/* ═══ WHITE THEME — OK저축은행 Library Semantic tokens (Figma 7367:22696) ═══ */
+:root{
+  --point:#FF571F;--point-strong:#E64813;--o100:#FFF8F6;--o200:#FFF2EE;--o300:#FFEAE4;
+  --ink100:#F7F7F9;--ink200:#F1F3F5;--ink250:#E9EBF0;--ink300:#C8CBD5;--ink400:#B2B7C0;
+  --ink450:#8C94A2;--ink500:#6C7080;--ink600:#4D5764;--ink700:#545964;--ink800:#161C26;
+  --ok:#FF571F;--ok-bg:#FFF2EE;--ok-hover:#E64813;
+  --bg:#F7F7F9;--t1:#161C26;--t2:#545964;--t3:#8C94A2;--br:#E9EBF0;--br-hover:#C8CBD5;--dk:#161C26;
+}
+.aff,.tt,.ct,.fmt,input,select{background:#fff;}
+.dl-row,.loc-info,#dl-sz-label{background:var(--ink100)!important;}
+
+</style></defs>'+svg.slice(svgTagEnd);
+  }
+
+  svg='<?xml version="1.0" encoding="UTF-8"?>\n'+svg;
+
+  var blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='okfg_card_'+face+'.svg'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},3000);
+  showToast((face==='front'?'앞면':'뒷면')+' SVG 다운로드 ✓');
+}
+
+function downloadBothSVG(){downloadSVG('front');setTimeout(function(){downloadSVG('back');},600);}
+
+/* ── DOWNLOAD: JPG ────────────────── */
+/* ── SVG 오버레이(rect/text/image)를 canvas에 직접 그리기 ──────────────
+   [버그 수정] 예전에는 오버레이 SVG 전체를 Blob→<img>로 래스터화해서
+   drawImage로 캔버스에 올렸는데, 브라우저는 <img>로 사용되는 SVG 안에
+   내장된 @font-face(OKFont)를 적용하지 않는다 (SVG를 "이미지"로 쓸 때는
+   커스텀 웹폰트 로딩이 막혀 있는 브라우저 표준 동작). 그 결과 JPG로
+   내보내면 미리보기와 다른 기본 폴백 폰트로 텍스트가 깨져 나왔다.
+   → overlay SVG를 직접 파싱해서 rect/text/image를 canvas 2D API로
+     그리면, fillText는 document.fonts에 이미 로드되어 있는 OKFont를
+     정상적으로 사용하므로 미리보기와 동일하게 나온다. */
+function renderOverlayToCanvas(ctx, svgString, scale){
+  var doc=new DOMParser().parseFromString(svgString,'image/svg+xml');
+  var root=doc.documentElement;
+
+  function num(el,name,def){var v=el.getAttribute(name);return v!=null?parseFloat(v):def;}
+  function translateOf(el){
+    var t=el.getAttribute('transform');
+    var m=t&&t.match(/translate\(\s*([-\d.]+)[ ,]\s*([-\d.]+)\s*\)/);
+    return m?[parseFloat(m[1]),parseFloat(m[2])]:null;
+  }
+  function scaleOf(el){
+    var t=el.getAttribute('transform');
+    var m=t&&t.match(/scale\(\s*([-\d.]+)\s*\)/);
+    return m?parseFloat(m[1]):1;
+  }
+  function loadImg(src){
+    return new Promise(function(resolve){
+      var img=new Image();
+      img.onload=function(){resolve(img);};
+      img.onerror=function(){resolve(null);};
+      img.src=src;
+    });
+  }
+  var supportsLetterSpacing=('letterSpacing' in ctx);
+
+  function drawText(el,k){
+    var tr=translateOf(el);
+    var x=tr?tr[0]:num(el,'x',0);
+    var y=tr?tr[1]:num(el,'y',0);
+    var anchor=el.getAttribute('text-anchor')||'start';
+    ctx.textAlign=(anchor==='end')?'right':(anchor==='middle'?'center':'left');
+    ctx.textBaseline='alphabetic';
+    var ff=el.getAttribute('font-family')||FF;
+    var fw=el.getAttribute('font-weight')||'400';
+    var fs=num(el,'font-size',10)*k;
+    var ls=el.getAttribute('letter-spacing');
+    if(supportsLetterSpacing) ctx.letterSpacing=(ls?(parseFloat(ls)*k):0)+'px';
+    ctx.fillStyle=el.getAttribute('fill')||'#000';
+    var tspans=Array.prototype.filter.call(el.childNodes,function(n){return n.nodeType===1&&n.tagName.toLowerCase()==='tspan';});
+    if(tspans.length){
+      /* tspan은 start 정렬(왼쪽 정렬) 텍스트에서만 쓰이므로 순서대로 이어붙여 그린다 */
+      var cx=x*k;
+      ctx.textAlign='left';
+      tspans.forEach(function(tspan){
+        var tfw=tspan.getAttribute('font-weight')||fw;
+        ctx.font=tfw+' '+fs+'px '+ff;
+        var txt=tspan.textContent;
+        ctx.fillText(txt,cx,y*k);
+        cx+=ctx.measureText(txt).width;
+      });
+    } else {
+      ctx.font=fw+' '+fs+'px '+ff;
+      ctx.fillText(el.textContent,x*k,y*k);
+    }
+    if(supportsLetterSpacing) ctx.letterSpacing='0px';
+  }
+
+  function drawRect(el,k){
+    ctx.fillStyle=el.getAttribute('fill')||'#000';
+    ctx.fillRect(num(el,'x',0)*k,num(el,'y',0)*k,num(el,'width',0)*k,num(el,'height',0)*k);
+  }
+
+  function drawImageEl(el,k){
+    return loadImg(el.getAttribute('href')).then(function(img){
+      if(!img) return;
+      ctx.drawImage(img,num(el,'x',0)*k,num(el,'y',0)*k,num(el,'width',0)*k,num(el,'height',0)*k);
+    });
+  }
+
+  function walk(node,k){
+    var children=Array.prototype.slice.call(node.children);
+    var p=Promise.resolve();
+    children.forEach(function(el){
+      var tag=el.tagName.toLowerCase();
+      p=p.then(function(){
+        if(tag==='image') return drawImageEl(el,k);
+        if(tag==='rect'){drawRect(el,k);return;}
+        if(tag==='text'){drawText(el,k);return;}
+        if(tag==='g') return walk(el,k*scaleOf(el));
+      });
+    });
+    return p;
+  }
+
+  return walk(root,scale);
+}
+
+function downloadJPG(face){
+  collectFormData(true); var d=S.d;
+  showToast('JPG 생성 중...');
+
+  /* 명함 규격 + 300dpi */
+  var physW=(S.type==='exec')?90:55;
+  var physH=(S.type==='exec')?50:85;
+  var cw=Math.round(physW/25.4*300);
+  var ch=Math.round(physH/25.4*300);
+
+  var canvas=document.createElement('canvas');
+  canvas.width=cw; canvas.height=ch;
+  var ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);
+
+  /* 배경 SVG */
+  /* [버그 수정] staff front는 계열사별 배경(getStaffFrontBgURI)을 써야 한다.
+     이전에는 고정된 STAFF_FRONT_FULL_URI(예시용 목업 이미지)를 그려놓고
+     그 위에 실제 텍스트를 다시 그렸기 때문에, 목업에 박혀있던 샘플
+     텍스트와 실제 입력값이 겹쳐 보이는("이중 노출") 문제가 있었음. */
+  var bgURI=(S.type==='exec')
+    ?((face==='front')?EXEC_FRONT_BG_URI:EXEC_BACK_BG_URI)
+    :((face==='front')?getStaffFrontBgURI(S.aff||d.staffCoKr||'OK저축은행'):STAFF_BACK_BG_URI);
+
+  function drawBackground(){
+    return new Promise(function(resolve){
+      var img=new Image();
+      img.onload=function(){ctx.drawImage(img,0,0,cw,ch);resolve();};
+      img.onerror=function(){resolve();};
+      img.src=bgURI;
+    });
+  }
+
+  function buildOverlay(){
+    var full;
+    if(S.type==='exec'){
+      full=(face==='front')?buildExecFrontSVG(d):buildExecBackSVG(d);
+    } else {
+      full=(face==='front')?buildStaffFrontSVG(d):buildStaffBackSVG(d);
+    }
+    /* 배경 <image> 태그 제거 (배경은 drawBackground()에서 이미 그렸음)
+       [수정] 예전에는 base64 데이터 URI만 매칭하는 정규식이라 지금의
+       상대경로(./logo/...) href와 맞지 않아 배경이 제거되지 않고 중복 그려지는
+       문제가 있었음. 실제 bgURI 값을 기준으로 정확히 매칭해서 제거한다.
+       (로고 <image>는 여기서 지우지 않으므로 walk()가 그대로 canvas에 그려준다) */
+    var bgEsc=bgURI.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var bgRe=new RegExp('<image href="'+bgEsc+'"[^/]*/>');
+    full=full.replace(bgRe,'');
+    /* SVG 자체 viewBox를 읽어서 캔버스 배율(scale)을 구한다 (하드코딩 방지) */
+    var vb=full.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+    var vw=vb?parseFloat(vb[1]):physW;
+    return {svg:full, scale:cw/vw};
+  }
+
+  function saveJPG(){
+    var a=document.createElement('a');
+    a.download='okfg_card_'+face+'.jpg';
+    a.href=canvas.toDataURL('image/jpeg',0.97);
+    a.click();
+    showToast((face==='front'?'앞면':'뒷면')+' JPG (300dpi) ✓');
+  }
+
+  /* document.fonts.ready 대기 후 배경 → 오버레이(canvas 직접 그리기) → 저장 순으로 진행 */
+  var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+  ready
+    .then(drawBackground)
+    .then(function(){
+      var ov=buildOverlay();
+      return renderOverlayToCanvas(ctx, ov.svg, ov.scale);
+    })
+    .then(saveJPG);
+}
+
+var SKEY='okfg_card_v6';
+/* [수정 #4] 이름/연락처/이메일/주소 같은 개인정보가 공용 PC에 무기한 남아있지 않도록
+   24시간 뒤 자동 만료시킨다. 만료된 데이터는 복원하지 않고 즉시 삭제한다. */
+var SKEY_TTL_MS=24*60*60*1000;
+function autoSave(){
+  try{
+    /* [수정] forExport=true로 호출해서 미입력 필드는 빈 문자열로 저장.
+       이전에는 fallback 예시값("김읏맨" 등)까지 그대로 localStorage에 저장되어,
+       새로고침 시 loadFromStorage()가 그 예시값을 input.value에 실제로 채워넣는
+       문제가 있었음 (placeholder처럼 "보이는" 게 아니라 진짜 값으로 들어감). */
+    collectFormData(true);
+    localStorage.setItem(SKEY,JSON.stringify(Object.assign({},S.d,{
+      type:S.type,aff:S.aff,eType:S.eType,sType:S.sType,
+      ts:new Date().toLocaleString('ko-KR'),
+      exp:Date.now()+SKEY_TTL_MS
+    })));
+  }catch(e){}
+}
+function loadFromStorage(){
+  try{
+    var raw=localStorage.getItem(SKEY); if(!raw) return; var o=JSON.parse(raw);
+    if(o.exp && Date.now()>o.exp){
+      /* 만료된 개인정보는 복원하지 않고 즉시 삭제 */
+      localStorage.removeItem(SKEY);
+      return;
+    }
+    if(o.type) S.type=o.type; if(o.aff) S.aff=o.aff;
+    if(o.eType) S.eType=o.eType; if(o.sType) S.sType=o.sType;
+    var fm={nameKr:'f-nkr',nameEn:'f-nen',nameHj:'f-nhj',titleKr:'f-tkr',titleEn:'f-ten',deptKr:'f-dkr',deptEn:'f-den',staffDeptKr:'f-ds-kr',staffDeptEn:'f-ds-en',staffTitleKr:'f-ts-kr',staffTitleEn:'f-ts-en',tel:'f-tel',fax:'f-fax',mobile:'f-mob',email2:'f-em2'};
+    /* [수정] 예전 버전 버그로 예시값("김읏맨" 등)이 이미 localStorage에 저장돼 있는
+       경우가 있어, 그런 레거시 오염 데이터는 복원하지 않고 빈 값으로 취급한다.
+       (collectFormData의 fv() 기본값과 반드시 동일하게 유지) */
+    var LEGACY_FALLBACK={
+      nameKr:'김읏맨',nameEn:'OKMAN KIM',nameHj:'金邑萬',titleKr:'이사',titleEn:'Advisor',
+      deptKr:'경영관리본부',deptEn:'Business Management Division',
+      staffDeptKr:'그래픽디자인팀',staffDeptEn:'Graphic Design Team',
+      staffTitleKr:'팀장',staffTitleEn:'Team Manager',
+      tel:'00-0000-0000',fax:'00-0000-0000',mobile:'010-0000-0000',
+      email:'0000000@okfngroup.com',email2:'name@gmail.com'
+    };
+    function isLegacy(k,v){return LEGACY_FALLBACK[k]!==undefined && v===LEGACY_FALLBACK[k];}
+    /* 이메일1: 아이디 + 도메인 복원 */
+    if(o.email && !isLegacy('email',o.email)){
+      var emlParts=o.email.split('@');
+      var emlIdEl=el('f-eml-id'), emlDomEl=el('f-eml-domain');
+      if(emlIdEl) emlIdEl.value=emlParts[0]||'';
+      if(emlDomEl&&emlParts[1]){
+        var knownDoms=['okfngroup.com','naver.com','gmail.com','daum.net','kakao.com','hanmail.net','nate.com','icloud.com'];
+        if(knownDoms.indexOf(emlParts[1])>=0){ emlDomEl.value=emlParts[1]; }
+        else { emlDomEl.value='custom'; var ce=el('f-eml-custom');if(ce){ce.value=emlParts[1];ce.style.display='';} }
+      }
+      var hidEl=el('f-eml'); if(hidEl) hidEl.value=o.email;
+    }
+    Object.keys(fm).forEach(function(k){var e=el(fm[k]);if(e&&o[k]&&!isLegacy(k,o[k])) e.value=o[k];});
+    /* 개인 이메일 분리 필드 복원 */
+    if(o.email2 && !isLegacy('email2',o.email2)){
+      var em2parts=o.email2.split('@');
+      if(em2parts.length===2){
+        var idEl=el('f-em2-id'),domEl=el('f-em2-domain');
+        if(idEl) idEl.value=em2parts[0];
+        if(domEl){
+          var knownDomains=['gmail.com','naver.com','daum.net','kakao.com','hanmail.net','nate.com','icloud.com'];
+          if(knownDomains.indexOf(em2parts[1])>=0){ domEl.value=em2parts[1]; }
+          else { domEl.value='custom'; var ce=el('f-em2-custom');if(ce){ce.value=em2parts[1];ce.style.display='';} }
+        }
+      }
+    }
+    if(o.type) setTimeout(function(){setInfoType(o.type);},100);
+    var st=el('storage-status'); if(st) st.textContent='저장 데이터 복원됨 ('+(o.ts||'이전 세션')+') · 24시간 후 자동 삭제';
+  }catch(e){}
+}
+function clearStorage(){
+  try{localStorage.removeItem(SKEY);var st=el('storage-status');if(st)st.textContent='초기화 완료';showToast('저장 데이터 삭제됨');}catch(e){}
+}
+
+/* ── INIT ─────────────────────────── */
+(function(){
+  var es=el('f-co-e'); if(es){execCoMap.forEach(function(c){var o=document.createElement('option');o.value=c[0];o.textContent=c[0];es.appendChild(o);});}
+  var ss=el('f-co-s'); if(ss){
+    ['OK저축은행','OK홀딩스','OK캐피탈','OK인베스트먼트파트너스','OK벤처스','OK AX','OK네트웍스','OK넥스트','아프로신용정보','아프로FnI','엑스인하우징','OK 옷맨 프로배구단','OK 옷맨 럭비단','OK 배·정 장학재단'].forEach(function(name){
+      var o=document.createElement('option');o.value=name;o.textContent=name;ss.appendChild(o);
+    });
+  }
+  var ts=el('f-ts-kr'); if(ts){tMap.forEach(function(t){var o=document.createElement('option');o.value=t[0];o.textContent=t[0];ts.appendChild(o);});}
+  var ls=el('f-loc'); if(ls){locs.forEach(function(l,i){var o=document.createElement('option');o.value=i;o.textContent=l[0]+'. '+l[1];ls.appendChild(o);});}
+  loadFromStorage();
+  /* f-eml-id: 복원 후 hidden 필드 동기화 */
+  (function(){var idEl=el('f-eml-id'),domEl=el('f-eml-domain'),hidEl=el('f-eml');
+    if(idEl&&domEl&&hidEl&&idEl.value){
+      var domain=domEl.value==='custom'?(el('f-eml-custom')?el('f-eml-custom').value:''):domEl.value;
+      if(idEl.value&&domain) hidEl.value=idEl.value+'@'+domain;
+    }
+  })();
+  /* 계열사 기본값: 저장값 없으면 OK저축은행 */
+  var _es=el('f-co-e');if(_es&&!_es.value){_es.value='OK저축은행';onExecCoCh();}
+  nav('main');
+})();
+</script>
+</body></html>

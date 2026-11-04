@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OK디자인봇</title>
+<style>
+/* OK저축은행 Library — Semantic tokens (Figma 7367:22696) */
+:root{
+  --point:#FF571F; --point-strong:#E64813;
+  --o100:#FFF8F6; --o200:#FFF2EE; --o300:#FFEAE4;
+  --ink100:#F7F7F9; --ink200:#F1F3F5; --ink250:#E9EBF0; --ink300:#C8CBD5; --ink400:#B2B7C0;
+  --ink450:#8C94A2; --ink500:#6C7080; --ink600:#4D5764; --ink700:#545964; --ink800:#161C26;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#fff;color:var(--ink800);font-family:"Pretendard","Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.6;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--ink250);background:#fff}
+.logo{font-weight:700;font-size:17px;letter-spacing:-.01em}
+.logo .en{margin-left:8px;font-size:12px;font-weight:500;color:var(--ink450);letter-spacing:0}
+.logo i{font-style:normal;color:var(--point)}
+header button{margin-left:auto;background:#fff;border:1px solid var(--ink250);color:var(--ink600);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+header button:hover{background:var(--ink100)}
+main{flex:1;overflow-y:auto}
+.thread{max-width:760px;margin:0 auto;padding:24px 20px 40px;display:flex;flex-direction:column;gap:18px}
+.welcome{padding:56px 0 8px}
+.welcome h1{font-size:24px;line-height:32px;margin:0 0 6px;font-weight:700}
+.welcome p{margin:0;color:var(--ink500)}
+.starters{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.starters button{background:#fff;border:1px solid var(--ink250);color:var(--ink700);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.starters button:hover{border-color:var(--point);color:var(--point-strong);background:var(--o100)}
+.msg{max-width:92%}
+.msg.me{align-self:flex-end;background:var(--ink200);color:var(--ink800);padding:10px 14px;border-radius:16px 16px 4px 16px;white-space:pre-wrap}
+.msg.bot{align-self:flex-start;display:flex;gap:10px}
+.av{flex:none;width:30px;height:30px;margin-top:0}
+.bot .body{padding-top:3px}
+.bot .body p{margin:0 0 10px}
+.cards{display:grid;gap:8px}
+.card{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--ink250);border-radius:12px;padding:12px 14px;text-decoration:none;color:inherit;transition:border-color .15s,background .15s}
+.card:hover,.card:focus-visible{border-color:var(--point);background:var(--o100);outline:none}
+.card .ic{flex:none;width:36px;height:36px;border-radius:9px;background:var(--o200);display:grid;place-items:center;font-size:18px}
+.card b{display:block;font-size:14.5px;font-weight:600}
+.card span{display:block;font-size:13px;color:var(--ink500)}
+.card .go{margin-left:auto;flex:none;background:var(--point);color:#fff;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600}
+.card:hover .go{background:var(--point-strong)}
+.typing{display:flex;gap:4px;padding-top:10px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ink400);animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+footer{padding:12px 20px 18px;background:#fff}
+.composer{max-width:760px;margin:0 auto;display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid var(--ink300);border-radius:16px;padding:8px 8px 8px 16px;box-shadow:0 2px 8px rgba(22,28,38,.05)}
+.composer:focus-within{border-color:var(--point)}
+textarea{flex:1;border:0;outline:0;background:transparent;color:var(--ink800);font:inherit;resize:none;max-height:160px;padding:7px 0}
+textarea::placeholder{color:var(--ink400)}
+#send{flex:none;width:38px;height:38px;border-radius:10px;border:0;background:var(--point);color:#fff;font-size:18px;cursor:pointer}
+#send:hover:not(:disabled){background:var(--point-strong)}
+#send:disabled{background:var(--ink250);color:var(--ink400);cursor:default}
+.hint{max-width:760px;margin:6px auto 0;font-size:12px;color:var(--ink450);text-align:center}
+:focus-visible{outline:2px solid var(--point);outline-offset:2px}
+@font-face{font-family:'OKche';src:url('/images/fonts/Ok-Light.woff2') format('woff2');font-weight:300}
+@font-face{font-family:'OKche';src:url('/images/fonts/Ok-Medium.woff2') format('woff2');font-weight:500}
+@font-face{font-family:'OKche';src:url('/images/fonts/Ok-Bold.woff2') format('woff2');font-weight:700}
+@font-face{font-family:'OKMAN';src:url('/images/fonts/OKMAN_FONT.woff2') format('woff2')}
+@font-face{font-family:'OKDDUNG';src:url('/images/fonts/OK_DDUNG.woff2') format('woff2')}
+@font-face{font-family:'OKGUNG';src:url('/images/fonts/OK_GUNG.woff2') format('woff2')}
+.widget{background:#fff;border:1px solid var(--ink250);border-radius:14px;padding:14px;width:min(560px,78vw)}
+.wbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.wbar b{font-size:14px;font-weight:600}
+.btn{border:0;border-radius:8px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;background:var(--point);color:#fff;white-space:nowrap}
+.btn:hover{background:var(--point-strong)}
+.btn.line{background:#fff;color:var(--point-strong);border:1px solid var(--point)}
+.btn.line:hover{background:var(--o200)}
+.btn.done{background:#E9F8E2;color:#137C09;border-color:#53B368}
+.btn:disabled{background:var(--ink250);color:var(--ink400);cursor:default;border-color:transparent}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.lcell{border:1px solid var(--ink250);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.lcell .th{height:72px;background:var(--ink100);display:grid;place-items:center;padding:10px}
+.lcell img{max-width:100%;max-height:52px;object-fit:contain}
+.lcell .nm{font-size:12px;padding:8px 10px 4px;line-height:1.35;flex:1}
+.lcell .btn{margin:0 8px 8px;padding:5px 0;font-size:12px}
+.frow{border-top:1px solid var(--ink250);padding:12px 0}
+.frow:first-of-type{border-top:0;padding-top:4px}
+.fname{font-size:13px;color:var(--ink500);margin-bottom:2px}
+.fprev{font-size:26px;line-height:1.3;color:var(--ink800);margin-bottom:8px;word-break:keep-all}
+.fbtns{display:flex;flex-wrap:wrap;gap:6px}
+.ftext{width:100%;border:1px solid var(--ink250);background:var(--ink100);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;margin-bottom:6px;color:var(--ink800);outline:0}
+.ftext:focus{border-color:var(--point);background:#fff}
+.gen textarea{width:100%;border:1px solid var(--ink250);background:var(--ink100);border-radius:10px;padding:10px 12px;font:inherit;min-height:64px;margin-bottom:8px}
+.gen textarea:focus{border-color:var(--point);background:#fff}
+.gen .row{display:flex;justify-content:flex-end;gap:6px}
+.prog{margin-top:4px}
+.prog .pct{font-size:22px;font-weight:700;color:var(--point)}
+.prog .track{height:6px;background:var(--ink200);border-radius:99px;overflow:hidden;margin:6px 0}
+.prog .fill{height:100%;width:0;background:var(--point);transition:width .15s linear}
+.prog .st{font-size:13px;color:var(--ink500)}
+.gres img{display:block;max-width:100%;max-height:280px;margin:0 auto 10px;border-radius:10px;background:repeating-conic-gradient(var(--ink200) 0 25%,#fff 0 50%) 0 0/16px 16px}
+.err{color:#EC3444;font-size:13px;margin-top:6px}
+@media (prefers-reduced-motion:reduce){#boot .dots i,#boot .bot,.eye,.welcome.in{animation:none}.typing i{animation:none}}
+#boot{position:fixed;inset:0;z-index:50;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .45s ease,visibility .45s}
+#boot.hide{opacity:0;visibility:hidden}
+#boot{flex-direction:column;gap:14px}
+#boot .bot{width:72px;height:72px;animation:bob 1.6s ease-in-out infinite}
+#boot .bot svg,.av svg{width:100%;height:100%;display:block}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 3s infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+#boot .bt,#boot .dots{font-size:16px;font-weight:600;color:var(--ink700)}
+#boot .dots i{font-style:normal;animation:dot 1.2s infinite;opacity:.15}
+#boot .dots i:nth-child(2){animation-delay:.2s}#boot .dots i:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,60%,100%{opacity:.15}30%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.welcome.in{animation:wIn .5s ease both}
+@keyframes wIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="boot" role="status" aria-live="polite"><div class="bot"><svg viewBox="0 0 64 64" aria-hidden="true"><line x1="32" y1="6" x2="32" y2="14" stroke="#FF571F" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="6" r="4" fill="#FF571F"/><rect x="8" y="14" width="48" height="40" rx="16" fill="#FF571F"/><rect x="15" y="22" width="34" height="22" rx="11" fill="#fff"/><circle class="eye" cx="25" cy="33" r="3.6" fill="#161C26"/><circle class="eye" cx="39" cy="33" r="3.6" fill="#161C26"/><rect x="3" y="28" width="5" height="12" rx="2.5" fill="#E64813"/><rect x="56" y="28" width="5" height="12" rx="2.5" fill="#E64813"/></svg></div><div><span class="bt">접속중</span><span class="dots"><i>.</i><i>.</i><i>.</i></span></div></div>
+<header>
+  <div class="logo">OK<i>디자인봇</i><span class="en">OK Design Bot</span></div>
+  <button id="reset">새 대화</button>
+</header>
+<main id="scroll">
+  <div class="thread" id="thread">
+    <div class="welcome" id="welcome">
+      <h1>무엇을 만들어 드릴까요?</h1>
+      <p>하고 싶은 일을 편하게 적어주세요. 로고·폰트·읏맨·일러스트는 여기서 바로 받을 수 있어요.</p>
+      <div class="starters">
+        <button>OK저축은행 로고 줘</button>
+        <button>폰트 다운받을래</button>
+        <button>배구공 든 읏맨 그려줘</button>
+        <button>일러스트 필요해</button>
+        <button>명함 만들고 싶어</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="composer">
+    <textarea id="input" rows="1" placeholder="예: 다음 주 이벤트 배너 만들어야 해"></textarea>
+    <button id="send" aria-label="보내기" disabled>↑</button>
+  </div>
+  <div class="hint">Enter 보내기 · Shift+Enter 줄바꿈</div>
+</footer>
+
+<script>
+/* ───────── 데이터 (각 에이전트 원본에서 가져옴) ───────── */
+const LOGO_BASE='/images/logo/', LOGO_ALL='OK금융그룹_전체로고.zip';
+const BRANDS=[
+ {name:'OK금융그룹',tags:['ok금융그룹','okgroup','금융그룹','그룹'],zip:'okgroup_ai.zip',img:'ok_group.png'},
+ {name:'OK저축은행',tags:['ok저축은행','okbank','저축은행','저축'],zip:'okbank_ai.zip',img:'ok_bank.png'},
+ {name:'OK캐피탈',tags:['ok캐피탈','okcapital','캐피탈'],zip:'okcapital_ai.zip',img:'ok_capital.png'},
+ {name:'OK홀딩스',tags:['ok홀딩스','okholdings','홀딩스'],zip:'okholdings_ai.zip',img:'ok_holdings.png'},
+ {name:'OK에이엑스',tags:['ok에이엑스','okax','에이엑스'],zip:'okax_ai.zip',img:'ok_ax.png'},
+ {name:'아프로신용정보',tags:['아프로신용정보','okci','신용정보'],zip:'okci_ai.zip',img:'ok_ci.png'},
+ {name:'아프로에프앤아이대부',tags:['아프로에프앤아이','okfni','에프앤아이','대부'],zip:'okfni_ai.zip',img:'ok_fni.png'},
+ {name:'OK넥스트',tags:['ok넥스트','oknext','넥스트'],zip:'oknext_ai.zip',img:'ok_next.png'},
+ {name:'OK인베스트먼트파트너스',tags:['ok인베스트먼트','okip','인베스트먼트','파트너스'],zip:'okip_ai.zip',img:'ok_ip.png'},
+ {name:'OK네트웍스',tags:['ok네트웍스','oknetworks','네트웍스'],zip:'oknetworks_ai.zip',img:'ok_networks.png'},
+ {name:'OKBANK 인도네시아',tags:['okbank인도네시아','인도네시아'],zip:'okbank_indonesia_ai.zip',img:'ok_bank_id.png'},
+ {name:'OK비교대출',tags:['ok비교대출','okbigyo','비교대출'],zip:'okbigyo_ai.zip',img:'ok_bigyo.png'},
+ {name:'OKPay',tags:['okpay','ok페이','페이'],zip:'okpay_ai.zip',img:'ok_pay.png'},
+ {name:'OK배·정장학재단',tags:['ok장학재단','okschool','장학재단','배정장학'],zip:'okschool_ai.zip',img:'ok_school.png'},
+ {name:'OK저축은행 읏맨 프로배구단',tags:['배구단','oksports','프로배구'],zip:'oksports_ai.zip',img:'ok_sports.png'},
+ {name:'OK저축은행 읏맨 럭비단',tags:['럭비단','럭비'],zip:'oksports_rugby_ai.zip',img:'ok_sports_rugby.png'}
+];
+const FONT_BASE='/images/fonts/', FONT_WIN='OK폰트_Windows.zip', FONT_MAC='OK폰트_Mac.zip';
+const FONTS=[
+ {name:'오케이체',family:'OKche',tags:['오케이체','기본서체','ok체'],weights:[
+   ['Light',300,'오케이체 Light.ttf','오케이체OTF Light.otf'],
+   ['Medium',500,'오케이체 Medium.ttf','오케이체OTF Medium.otf'],
+   ['Bold',700,'오케이체 Bold.ttf','오케이체OTF Bold.otf']]},
+ {name:'읏맨체',family:'OKMAN',tags:['읏맨체'],weights:[['Regular',400,'OKMAN FONT.ttf','OKMAN FONT.otf']]},
+ {name:'읏뚱체',family:'OKDDUNG',tags:['읏뚱체','뚱체'],weights:[['Regular',400,'OK DDUNG.ttf','OK DDUNG.otf']]},
+ {name:'읏궁체',family:'OKGUNG',tags:['읏궁체','궁체'],weights:[['Regular',400,'OK GUNG.ttf','OK GUNG.otf']]}
+];
+
+/* 채팅 안에서 바로 실행되는 에이전트 */
+const INLINE=[
+ {id:'logo',kw:['로고','ci','심볼','bi'],render:renderLogo},
+ {id:'font',kw:['폰트','서체','글꼴','오케이체','읏맨체','읏뚱체','읏궁체'],render:renderFont},
+ {id:'okman',kw:['읏맨','캐릭터','마스코트'],render:t=>renderGen(t,GEN.okman)},
+ {id:'illust',kw:['일러스트','삽화','그림','illust'],render:t=>renderGen(t,GEN.illust)}
+];
+/* 페이지로 이동하는 에이전트 */
+const LINKS=[
+ {name:'명함 생성기',desc:'계열사·직함 입력하고 SVG/JPG로 저장',icon:'🪪',url:'bizcard.html',kw:['명함','비즈카드','직함']},
+ {name:'배너 메이커',desc:'이벤트·프로모션 배너 시안 제작',icon:'🖼️',url:'banner.html',kw:['배너','현수막','프로모션','팝업']},
+ {name:'네이밍·카피 + 리스크 검수',desc:'이름·문구 생성 후 오탈자·리스크 점검',icon:'✍️',url:'agent-naming.html',kw:['네이밍','작명','카피','문구','슬로건','오타','맞춤법','검수','이름 지어']},
+ {name:'OKO 이미지 스튜디오',desc:'AI로 이미지 생성',icon:'✨',url:'oko.html',kw:['ai 이미지','이미지 생성','사진','합성']}
+];
+
+/* ───────── 공통 ───────── */
+const BOT_SVG=`<svg viewBox="0 0 64 64" aria-hidden="true"><line x1="32" y1="6" x2="32" y2="14" stroke="#FF571F" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="6" r="4" fill="#FF571F"/><rect x="8" y="14" width="48" height="40" rx="16" fill="#FF571F"/><rect x="15" y="22" width="34" height="22" rx="11" fill="#fff"/><circle cx="25" cy="33" r="3.6" fill="#161C26"/><circle cx="39" cy="33" r="3.6" fill="#161C26"/><rect x="3" y="28" width="5" height="12" rx="2.5" fill="#E64813"/><rect x="56" y="28" width="5" height="12" rx="2.5" fill="#E64813"/></svg>`;
+const $=s=>document.querySelector(s);
+const thread=$('#thread'),input=$('#input'),send=$('#send'),scroll=$('#scroll');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const down=()=>scroll.scrollTop=scroll.scrollHeight;
+const has=(t,kw)=>kw.some(k=>t.includes(k));
+function dl(url,name,btn){
+  const a=Object.assign(document.createElement('a'),{href:url,download:name});
+  document.body.appendChild(a);a.click();a.remove();
+  if(btn){const o=btn.textContent;btn.classList.add('done');btn.textContent='✓ 받는 중';setTimeout(()=>{btn.classList.remove('done');btn.textContent=o},1800)}
+}
+function linkCard(a){return `<a class="card" href="${a.url}"><div class="ic">${a.icon}</div><div><b>${a.name}</b><span>${a.desc}</span></div><div class="go">열기</div></a>`}
+function botMsg(){const m=el('div','msg bot','<div class="av">'+BOT_SVG+'</div><div class="body"></div>');thread.append(m);return m.querySelector('.body')}
+
+/* ───────── 로고 ───────── */
+function renderLogo(t,body){
+  const hit=BRANDS.filter(b=>has(t,b.tags.concat(b.name.toLowerCase())));
+  const list=hit.length?hit:BRANDS;
+  body.innerHTML=`<p>${hit.length?'요청하신 로고예요.':'계열사 로고 전체예요. 필요한 것만 받으세요.'} ZIP에는 AI 원본과 PNG(RGB·CMYK)가 들어 있어요.</p>`;
+  const w=el('div','widget',`<div class="wbar"><b>로고 ${list.length}종</b><button class="btn line">전체 로고 ZIP</button></div><div class="lgrid"></div>`);
+  w.querySelector('.wbar .btn').onclick=e=>dl(LOGO_BASE+LOGO_ALL,LOGO_ALL,e.target);
+  const g=w.querySelector('.lgrid');
+  list.forEach(b=>{
+    const c=el('div','lcell',`<div class="th"><img src="${LOGO_BASE+b.img}" alt="${esc(b.name)} 로고"></div><div class="nm">${esc(b.name)}</div><button class="btn">ZIP 받기</button>`);
+    c.querySelector('.btn').onclick=e=>dl(LOGO_BASE+b.zip,b.zip,e.target);
+    g.append(c);
+  });
+  body.append(w);
+}
+
+/* ───────── 폰트 ───────── */
+function renderFont(t,body){
+  const hit=FONTS.filter(f=>has(t,f.tags));
+  const list=hit.length?hit:FONTS;
+  body.innerHTML=`<p>${hit.length?'요청하신 서체예요.':'사내 전용서체 4종이에요.'} Windows는 TTF, Mac은 OTF 파일이에요.</p>`;
+  const w=el('div','widget',`<div class="wbar"><b>OK 전용서체</b><div class="fbtns"><button class="btn win">Windows용 전체</button><button class="btn mac">Mac용 전체</button></div></div><input class="ftext" value="오늘도 좋은 하루, OK금융그룹" aria-label="미리보기 문구">`);
+  w.querySelector('.win').onclick=e=>dl(FONT_BASE+encodeURIComponent(FONT_WIN),FONT_WIN,e.target);
+  w.querySelector('.mac').onclick=e=>dl(FONT_BASE+encodeURIComponent(FONT_MAC),FONT_MAC,e.target);
+  const rows=[];
+  list.forEach(f=>{
+    const r=el('div','frow',`<div class="fname">${f.name}</div><div class="fprev" style="font-family:'${f.family}';font-weight:${f.weights[f.weights.length>1?1:0][1]}"></div><div class="fbtns"></div>`);
+    f.weights.forEach(([lb,,ttf,otf])=>{
+      [['Windows',ttf],['Mac',otf]].forEach(([k,file])=>{
+        const b=el('button','btn line',`${f.weights.length>1?lb+' ':''}${k}`);
+        b.onclick=()=>dl(FONT_BASE+encodeURIComponent(file),file,b);
+        r.querySelector('.fbtns').append(b);
+      });
+    });
+    rows.push(r.querySelector('.fprev'));w.append(r);
+  });
+  const inp=w.querySelector('.ftext'),upd=()=>rows.forEach(p=>p.textContent=inp.value||' ');
+  inp.oninput=upd;upd();body.append(w);
+}
+
+/* ───────── 읏맨 / 일러스트 생성 (원본 파이프라인 이식) ───────── */
+const GEN={
+  okman:{api:'/api/okman',title:'읏맨 이미지 생성',ask:'어떤 읏맨을 그릴까요?',ph:'예: 배구공을 들고 환하게 웃는 읏맨',drawing:'읏맨을 그리는 중입니다... (30초~3분)'},
+  illust:{api:'/api/illust',title:'OK 일러스트 생성',ask:'어떤 일러스트가 필요하세요?',ph:'예: 노트북으로 적금을 확인하는 직장인',drawing:'일러스트를 그리는 중입니다... (30초~3분)'}
+};
+function stripIntent(t){
+  return t.replace(/(읏맨|일러스트|삽화|캐릭터|이미지|그림)?\s*(만들어\s*줘|그려\s*줘|생성해\s*줘|필요해|주세요|줘)\.?$/,'').trim();
+}
+async function postJSON(u,b){const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const d=await r.json();if(!r.ok||d.error)throw new Error(d.error||r.status);return d}
+async function poll(api,id,onP){
+  for(let i=0;i<60;i++){
+    await new Promise(r=>setTimeout(r,5000));
+    const d=await (await fetch(api+'/job?id='+encodeURIComponent(id))).json();
+    if(d.error)throw new Error(d.error);
+    onP(d.progress||0);
+    if(d.status==='success')return d;
+    if(['failure','failed','canceled','cancelled'].includes(d.status))throw new Error('생성 실패 ('+d.status+')');
+  }
+  throw new Error('5분이 지났어요. 다시 시도해 주세요.');
+}
+function renderGen(t,cfg){return (body)=>{}}
+function renderGenInto(t,cfg,body){
+  const seed=stripIntent(t);
+  const prefill=seed.length>4?seed:'';
+  body.innerHTML=`<p>${cfg.ask} 내용을 확인하고 생성을 눌러주세요.</p>`;
+  const w=el('div','widget gen',`<div class="wbar"><b>${cfg.title}</b></div><textarea placeholder="${cfg.ph}">${esc(prefill)}</textarea><div class="row"><button class="btn">생성하기</button></div><div class="out"></div>`);
+  const ta=w.querySelector('textarea'),go=w.querySelector('.row .btn'),out=w.querySelector('.out');
+  go.onclick=()=>run(ta.value.trim());
+  body.append(w);
+  async function run(p){
+    if(!p){ta.focus();return}
+    go.disabled=true;ta.readOnly=true;
+    out.innerHTML=`<div class="prog"><div class="pct">0%</div><div class="track"><div class="fill"></div></div><div class="st">요청을 접수했습니다...</div></div>`;
+    const pct=out.querySelector('.pct'),fill=out.querySelector('.fill'),st=out.querySelector('.st');
+    const S={request:[0,8,5],gen:[8,70,200],rmbg:[78,19,45]};
+    let stage='request',t0=Date.now(),real=0,shown=0,done=false;
+    const set=(n,label)=>{stage=n;t0=Date.now();real=0;st.textContent=label};
+    const timer=setInterval(()=>{
+      const [b,s,c]=S[stage];
+      const target=done?100:Math.max(b+s*Math.min((Date.now()-t0)/(c*1000),.97),b+s*real);
+      shown+=(target-shown)*(done?.25:.06);
+      pct.textContent=Math.floor(shown)+'%';fill.style.width=shown+'%';
+    },80);
+    try{
+      const g=await postJSON(cfg.api+'/generate',{prompt:p});
+      set('gen',cfg.drawing);
+      const gen=await poll(cfg.api,g.jobId,v=>real=Math.max(real,v));
+      const rb=await postJSON(cfg.api+'/remove-bg',{assetId:gen.assetIds[0]});
+      set('rmbg','배경을 정리하는 중입니다...');
+      const fin=await poll(cfg.api,rb.jobId,v=>real=Math.max(real,v));
+      done=true;st.textContent='마무리하는 중입니다...';
+      await new Promise(r=>setTimeout(r,600));clearInterval(timer);
+      out.innerHTML=`<div class="gres"><img src="${fin.images[0]}" alt="생성 결과"><div class="row"><button class="btn line again">다시 만들기</button><a class="btn" href="${cfg.api}/download?asset=${encodeURIComponent(fin.assetIds[0])}" style="text-decoration:none">PNG 다운로드</a></div></div>`;
+      out.querySelector('.again').onclick=()=>{ta.readOnly=false;go.disabled=false;out.innerHTML='';ta.focus()};
+    }catch(e){
+      clearInterval(timer);go.disabled=false;ta.readOnly=false;
+      out.innerHTML=`<div class="err">생성하지 못했어요: ${esc(e.message)} — 문구를 다듬어 다시 시도해 주세요.</div>`;
+    }
+    down();
+  }
+}
+
+/* ───────── 라우팅 ───────── */
+function respond(text,body){
+  const t=text.toLowerCase();
+  const inl=INLINE.find(a=>has(t,a.kw));
+  const links=LINKS.filter(a=>has(t,a.kw));
+  if(inl&&!(links.length&&t.indexOf(links[0].kw.find(k=>t.includes(k)))<t.indexOf(inl.kw.find(k=>t.includes(k))))){
+    if(inl.id==='okman'||inl.id==='illust') renderGenInto(text,GEN[inl.id],body);
+    else inl.render(t,body);
+    return;
+  }
+  if(links.length){
+    body.innerHTML=`<p>${links.length===1?links[0].name+'에서 바로 할 수 있어요.':'이 에이전트들이 도움이 될 거예요.'}</p><div class="cards">${links.map(linkCard).join('')}</div>`;
+    return;
+  }
+  body.innerHTML=`<p>딱 맞는 기능을 찾지 못했어요. 이렇게 물어보세요: “OK저축은행 로고 줘”, “읏맨체 받을래”, “배구하는 읏맨 그려줘”, “명함 만들래”.</p><div class="cards">${LINKS.map(linkCard).join('')}</div>`;
+}
+function submit(text){
+  text=text.trim();if(!text)return;
+  $('#welcome')?.remove();
+  thread.append(el('div','msg me',esc(text)));
+  input.value='';resize();send.disabled=true;
+  const body=botMsg();body.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';down();
+  setTimeout(()=>{respond(text,body);down()},400);
+}
+function resize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,160)+'px'}
+input.addEventListener('input',()=>{resize();send.disabled=!input.value.trim()});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();submit(input.value)}});
+send.onclick=()=>submit(input.value);
+document.addEventListener('click',e=>{const b=e.target.closest('.starters button');if(b)submit(b.textContent)});
+$('#reset').onclick=()=>location.reload();
+
+/* ───────── 접속 연출 ───────── */
+(function boot(){
+  const b=$('#boot'),t=matchMedia('(prefers-reduced-motion: reduce)').matches?300:1400;
+  setTimeout(()=>{b.classList.add('hide');$('#welcome')?.classList.add('in');input.focus();setTimeout(()=>b.remove(),500)},t);
+})();
+</script>
+</body>
+</html>
